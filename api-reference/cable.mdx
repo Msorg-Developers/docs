@@ -1,0 +1,196 @@
+---
+title: "Cable TV"
+description: "Validate decoder numbers and subscribe to DStv, GOtv, and Startimes"
+---
+
+## Overview
+
+Renew or subscribe to cable TV plans. The flow is:
+
+1. **Validate** the smartcard/decoder number → confirm account details
+2. **Purchase** → activate the subscription
+
+---
+
+## Supported providers
+
+| Provider | Product prefix |
+|----------|---------------|
+| DStv | `DStv ...` |
+| GOtv | `GOtv ...` |
+| Startimes | `Startimes ...` |
+
+---
+
+## Validate Smartcard
+
+Verify a decoder number and retrieve customer and subscription details before purchase.
+
+```http
+GET /cable/validate
+```
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer <api-key>` | ✅ |
+| `channel` | `API` | ✅ |
+
+### Query parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `smartcardNumber` | string | ✅ | The decoder/smartcard number |
+| `product` | string | ✅ | Provider + plan name (e.g. `"DStv Compact"`) |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl "https://api.dancity.app/cable/validate?smartcardNumber=1234567890&product=DStv%20Compact" \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "channel: API"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  smartcardNumber: "1234567890",
+  product: "DStv Compact",
+});
+const res = await fetch(`https://api.dancity.app/cable/validate?${params}`, {
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    channel: "API",
+  },
+});
+const data = await res.json();
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Smartcard validated successfully",
+  "data": {
+    "customerName": "JANE DOE",
+    "smartcardNumber": "1234567890",
+    "currentPlan": "DStv Compact",
+    "dueDate": "2024-05-01",
+    "renewalAmount": 15800
+  }
+}
+```
+
+---
+
+## Purchase Cable Subscription
+
+Subscribe or renew a cable TV plan.
+
+```http
+POST /cable/purchase
+```
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer <api-key>` | ✅ |
+| `Content-Type` | `application/json` | ✅ |
+| `channel` | `API` | ✅ |
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✅ | Provider + plan (e.g. `"DStv Compact"`) |
+| `smartcardNumber` | string | ✅ | Decoder/smartcard number |
+| `phone` | string | ✅ | 11-digit contact phone number |
+| `pin` | string | ✅ | Your 4-digit transaction PIN |
+| `customerRef` | string | ❌ | Your own reference for idempotency |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.dancity.app/cable/purchase \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "product": "DStv Compact",
+    "smartcardNumber": "1234567890",
+    "phone": "08012345678",
+    "pin": "1234",
+    "customerRef": "CABLE-ORDER-001"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/cable/purchase", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    product: "DStv Compact",
+    smartcardNumber: "1234567890",
+    phone: "08012345678",
+    pin: "1234",
+    customerRef: "CABLE-ORDER-001",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+resp = requests.post(
+    "https://api.dancity.app/cable/purchase",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "product": "DStv Compact",
+        "smartcardNumber": "1234567890",
+        "phone": "08012345678",
+        "pin": "1234",
+        "customerRef": "CABLE-ORDER-001",
+    },
+)
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Cable subscription successful",
+  "data": {
+    "transactionId": "TXN-2024-01011",
+    "reference": "dcy_ref_jkl101",
+    "customerRef": "CABLE-ORDER-001",
+    "smartcardNumber": "1234567890",
+    "customerName": "JANE DOE",
+    "plan": "DStv Compact",
+    "amount": 15800,
+    "provider": "DStv",
+    "renewalDate": "2024-05-21",
+    "status": "success"
+  }
+}
+```
+
+<Note>
+  Always **validate the smartcard** before purchase. The validation response
+  also includes the exact renewal amount so you can display it to your user.
+</Note>

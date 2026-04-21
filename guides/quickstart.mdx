@@ -1,0 +1,147 @@
+---
+title: "Quickstart"
+description: "Make your first Dancity API call in under 5 minutes"
+---
+
+## Prerequisites
+
+- A Dancity account with **Tier 3** status
+- An approved API client (see [Before you start](/index#before-you-start))
+- A generated API key (from your [profile page](https://dancity.app/profile/api-key))
+
+## Step 1 — Set up your credentials
+
+Store your API key securely in an environment variable. **Never commit it to source control.**
+
+```bash
+export DANCITY_API_KEY="dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+```
+
+## Step 2 — Check your wallet balance
+
+Before purchasing any service, verify you have sufficient wallet balance.
+
+<CodeGroup>
+```bash cURL
+curl -X GET https://api.dancity.app/wallet \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "channel: API"
+```
+
+```javascript Node.js
+const response = await fetch("https://api.dancity.app/wallet", {
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    channel: "API",
+  },
+});
+const data = await response.json();
+console.log(data);
+```
+
+```python Python
+import requests, os
+
+resp = requests.get(
+    "https://api.dancity.app/wallet",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "channel": "API",
+    },
+)
+print(resp.json())
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Wallets retrieved",
+  "data": [
+    {
+      "_id": "6620f3a...",
+      "balance": 5000.00,
+      "currency": "NGN",
+      "type": "main"
+    }
+  ]
+}
+```
+
+## Step 3 — Buy airtime
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.dancity.app/airtime/buy \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "product": "MTN Airtime",
+    "phone": "08012345678",
+    "amount": 100,
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const response = await fetch("https://api.dancity.app/airtime/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    product: "MTN Airtime",
+    phone: "08012345678",
+    amount: 100,
+    pin: "1234",
+  }),
+});
+const data = await response.json();
+console.log(data);
+```
+</CodeGroup>
+
+**Response:**
+
+```json
+{
+  "success": true,
+  "message": "Airtime purchase successful",
+  "data": {
+    "transactionId": "TXN-2024-XXXX",
+    "phone": "08012345678",
+    "amount": 100,
+    "network": "MTN",
+    "status": "success",
+    "reference": "dcy_ref_xxxxxx"
+  }
+}
+```
+
+## Step 4 — Receive webhooks (optional)
+
+Set your webhook URL from your [profile page](https://dancity.app/profile/api-key). Dancity will `POST` a signed payload to that URL for every transaction event.
+
+See the [Webhook guide](/guides/webhook) for verification instructions.
+
+## What's next?
+
+<CardGroup cols={2}>
+  <Card title="Authentication" icon="lock" href="/guides/authentication">
+    Learn how API key auth and IP allowlists work
+  </Card>
+  <Card title="Error codes" icon="triangle-exclamation" href="/guides/errors">
+    Understand every error response
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/guides/webhook">
+    Receive real-time transaction notifications
+  </Card>
+  <Card title="All endpoints" icon="code" href="/api-reference/overview">
+    Browse the full API reference
+  </Card>
+</CardGroup>

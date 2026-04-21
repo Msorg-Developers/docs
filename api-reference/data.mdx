@@ -1,0 +1,189 @@
+---
+title: "Data"
+description: "Purchase mobile data bundles for any Nigerian network"
+---
+
+## Overview
+
+Purchase data bundles for MTN, Airtel, Glo, and 9mobile. Use your platform's product catalogue to get the list of available plans and their identifiers.
+
+---
+
+## Buy Data
+
+```http
+POST /buy-data
+```
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer <api-key>` | ✅ |
+| `Content-Type` | `application/json` | ✅ |
+| `channel` | `API` | ✅ |
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✅ | Data plan product name (e.g. `"MTN 1GB"`) |
+| `phone` | string | ✅ | 11-digit Nigerian phone number |
+| `pin` | string | ✅ | Your 4-digit transaction PIN |
+| `customerRef` | string | ❌ | Your own reference for idempotency |
+| `saveAsBeneficiary` | boolean | ❌ | Save phone as a beneficiary |
+| `beneficiaryName` | string | ❌ | Label for the saved beneficiary |
+| `couponCode` | string | ❌ | Promotional coupon code |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.dancity.app/buy-data \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "product": "MTN 1GB",
+    "phone": "08012345678",
+    "pin": "1234",
+    "customerRef": "DATA-ORDER-001"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/buy-data", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    product: "MTN 1GB",
+    phone: "08012345678",
+    pin: "1234",
+    customerRef: "DATA-ORDER-001",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+resp = requests.post(
+    "https://api.dancity.app/buy-data",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "product": "MTN 1GB",
+        "phone": "08012345678",
+        "pin": "1234",
+        "customerRef": "DATA-ORDER-001",
+    },
+)
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Data purchase successful",
+  "data": {
+    "transactionId": "TXN-2024-00456",
+    "reference": "dcy_ref_def456",
+    "customerRef": "DATA-ORDER-001",
+    "phone": "08012345678",
+    "network": "MTN",
+    "plan": "MTN 1GB",
+    "amount": 350,
+    "status": "success",
+    "walletBalanceBefore": 4500,
+    "walletBalanceAfter": 4150
+  }
+}
+```
+
+---
+
+## Bulk Data
+
+Purchase data bundles for multiple phone numbers in a single call.
+
+```http
+POST /buy-data/bulk
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `recipients` | array | ✅ | Array of recipient objects (max 50) |
+| `recipients[].phone` | string | ✅ | 11-digit phone number |
+| `recipients[].product` | string | ✅ | Data plan product name |
+| `pin` | string | ✅ | Your 4-digit transaction PIN |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl -X POST https://api.dancity.app/buy-data/bulk \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "pin": "1234",
+    "recipients": [
+      { "product": "MTN 1GB", "phone": "08012345678" },
+      { "product": "Glo 2GB", "phone": "08087654321" }
+    ]
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/buy-data/bulk", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    pin: "1234",
+    recipients: [
+      { product: "MTN 1GB", phone: "08012345678" },
+      { product: "Glo 2GB", phone: "08087654321" },
+    ],
+  }),
+});
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Bulk data purchase processed",
+  "data": {
+    "successCount": 2,
+    "failureCount": 0,
+    "results": [
+      { "phone": "08012345678", "plan": "MTN 1GB", "status": "success", "reference": "dcy_ref_aaa" },
+      { "phone": "08087654321", "plan": "Glo 2GB", "status": "success", "reference": "dcy_ref_bbb" }
+    ]
+  }
+}
+```
+
+<Tip>
+  Data plan product names and prices change periodically. Contact support at
+  [support@dancity.app](mailto:support@dancity.app) for the current product
+  catalogue.
+</Tip>

@@ -1,0 +1,94 @@
+---
+title: "Rate Limits"
+description: "Understanding request limits and how to handle throttling"
+---
+
+## Overview
+
+Dancity enforces rate limits to ensure platform stability and fair use across all API clients.
+
+## Limits
+
+| Scope | Limit |
+|-------|-------|
+| Global (per API key) | **120 requests / minute** |
+| VAS purchases (airtime, data, electricity, cable) | **30 requests / minute** |
+| OTP requests | **5 requests / 10 minutes** |
+| Bulk operations (bulk airtime, bulk data) | **10 requests / minute** |
+
+## Rate limit headers
+
+Every response includes the following headers:
+
+| Header | Description |
+|--------|-------------|
+| `X-RateLimit-Limit` | Maximum requests allowed in the window |
+| `X-RateLimit-Remaining` | Requests remaining in the current window |
+| `X-RateLimit-Reset` | Unix timestamp when the window resets |
+
+## Handling 429 responses
+
+When you exceed the limit, you receive:
+
+```json
+{
+  "statusCode": 429,
+  "message": "Too Many Requests",
+  "error": "Too Many Requests"
+}
+```
+
+**Implement exponential backoff:**
+
+<CodeGroup>
+```javascript Node.js
+async function fetchWithRetry(url, options, retries = 3) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    const response = await fetch(url, options);
+
+    if (response.status !== 429) return response;
+
+    if (attempt === retries) throw new Error("Rate limit exceeded after retries");
+
+    // Exponential backoff: 1s, 2s, 4s
+    const delay = Math.pow(2, attempt) * 1000;
+    console.log(`Rate limited. Retrying in ${delay}ms...`);
+    await new Promise((resolve) => setTimeout(resolve, delay));
+  }
+}
+```
+
+```python Python
+import time, requests
+
+def fetch_with_retry(url, **kwargs):
+    for attempt in range(4):
+        resp = requests.request(url=url, **kwargs)
+        if resp.status_code != 429:
+            return resp
+        if attempt == 3:
+            raise Exception("Rate limit exceeded after retries")
+        delay = 2 ** attempt
+        print(f"Rate limited. Retrying in {delay}s...")
+        time.sleep(delay)
+```
+</CodeGroup>
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Use the bulk endpoints">
+    For sending airtime or data to multiple recipients at once, use the bulk
+    endpoints (`POST /airtime/bulk`, `POST /buy-data/bulk`). A single bulk
+    request counts as one request against your rate limit.
+  </Accordion>
+  <Accordion title="Cache where possible">
+    Electricity meter and cable smartcard validation results can be cached
+    client-side for a short period. There's no need to re-validate on every
+    page load.
+  </Accordion>
+  <Accordion title="Monitor X-RateLimit-Remaining">
+    Check `X-RateLimit-Remaining` before making bursts of requests. If it drops
+    below 10, slow down or pause until `X-RateLimit-Reset`.
+  </Accordion>
+</AccordionGroup>

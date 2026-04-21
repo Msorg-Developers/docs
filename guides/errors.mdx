@@ -1,0 +1,134 @@
+---
+title: "Error Reference"
+description: "Understand every error the Dancity API can return"
+---
+
+## Error response format
+
+All errors follow a consistent JSON structure:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Human-readable description of the error",
+  "error": "Bad Request"
+}
+```
+
+For validation errors, `message` may be an **array** of field-level messages:
+
+```json
+{
+  "statusCode": 400,
+  "message": [
+    "phone must be 11 digits",
+    "amount must not be less than 50"
+  ],
+  "error": "Bad Request"
+}
+```
+
+## HTTP status codes
+
+| Code | Name | When it occurs |
+|------|------|---------------|
+| `200` | OK | Request succeeded |
+| `201` | Created | Resource created (e.g. access request submitted) |
+| `400` | Bad Request | Invalid request body, failed validation, or business logic error |
+| `401` | Unauthorized | Missing, invalid, or revoked API key |
+| `403` | Forbidden | Action not permitted for your account tier or status |
+| `404` | Not Found | The requested resource does not exist |
+| `429` | Too Many Requests | Rate limit exceeded |
+| `500` | Internal Server Error | An unexpected error on our side |
+
+## Common error messages
+
+### Authentication & access
+
+| Message | Cause | Fix |
+|---------|-------|-----|
+| `Unauthorized` | Missing or invalid API key | Check your `Authorization` header |
+| `API access is only available to Tier 3 users` | Account not yet Tier 3 | Complete verification to upgrade |
+| `No approved API client found` | Access request not approved | Submit an access request from your dashboard |
+| `Your API key is not active` | Key revoked or disabled | Regenerate your API key |
+
+### Validation errors
+
+| Message | Cause |
+|---------|-------|
+| `Phone number must be 11 digits` | `phone` field format invalid |
+| `minimum amount is N50` | `amount` below minimum |
+| `maximum amount is N10000` | `amount` above maximum |
+| `Webhook must be a valid HTTPS URL` | `webhookUrl` not HTTPS |
+| `Maximum of 20 IP entries` | IP allowlist limit reached |
+
+### Transaction errors
+
+| Message | Cause |
+|---------|-------|
+| `Insufficient wallet balance` | Not enough funds in wallet |
+| `Invalid transaction PIN` | Wrong PIN supplied |
+| `Product not found` | Network/product name unrecognized |
+| `Meter number validation failed` | Meter number incorrect or service unavailable |
+| `Smartcard validation failed` | Decoder number incorrect |
+
+### OTP errors
+
+| Message | Cause |
+|---------|-------|
+| `Invalid OTP` | Wrong or expired OTP entered |
+| `OTP has expired` | OTP not used within the time window (10 minutes) |
+| `Too many OTP attempts` | OTP locked after repeated failures |
+
+## Handling errors in code
+
+<CodeGroup>
+```javascript Node.js
+const response = await fetch("https://api.dancity.app/airtime/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({ product: "MTN Airtime", phone: "08012345678", amount: 100, pin: "1234" }),
+});
+
+if (!response.ok) {
+  const error = await response.json();
+  console.error(`Error ${error.statusCode}: ${error.message}`);
+  // Handle specific codes
+  if (response.status === 401) { /* refresh credentials */ }
+  if (response.status === 400) { /* fix request parameters */ }
+  return;
+}
+
+const data = await response.json();
+```
+
+```python Python
+import requests
+
+resp = requests.post(
+    "https://api.dancity.app/airtime/buy",
+    headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={"product": "MTN Airtime", "phone": "08012345678", "amount": 100, "pin": "1234"},
+)
+
+if not resp.ok:
+    err = resp.json()
+    print(f"Error {err['statusCode']}: {err['message']}")
+    raise Exception(err["message"])
+
+data = resp.json()
+```
+</CodeGroup>
+
+<Tip>
+  Log the full error response body for every failed API call. The `message` field
+  is always human-readable and helps quickly identify the root cause.
+</Tip>

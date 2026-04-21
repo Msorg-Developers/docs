@@ -1,0 +1,178 @@
+---
+title: "Webhooks"
+description: "Receive real-time transaction event notifications from Dancity"
+---
+
+## Overview
+
+Dancity sends an HTTP `POST` request to your configured webhook URL whenever a transaction event occurs. This allows you to keep your system in sync without polling the transactions endpoint.
+
+## Setting up your webhook URL
+
+1. Go to your [API Key page](https://dancity.app/profile/api-key)
+2. Enter your webhook URL under **Webhook URL** — it must be **HTTPS**
+3. Click **Save Webhook URL**
+
+<Info>
+  Your webhook URL must be publicly accessible. Localhost URLs will not work in
+  production. Use a tool like [ngrok](https://ngrok.com) during local development.
+</Info>
+
+## Event payload
+
+All webhook payloads share the same envelope structure:
+
+```json
+{
+  "event": "transaction.success",
+  "timestamp": "2024-04-21T10:30:00.000Z",
+  "data": {
+    "transactionId": "TXN-2024-XXXXX",
+    "type": "AIRTIME",
+    "status": "success",
+    "amount": 500,
+    "currency": "NGN",
+    "phone": "08012345678",
+    "reference": "dcy_ref_xxxxxxxx",
+    "createdAt": "2024-04-21T10:29:58.000Z"
+  }
+}
+```
+
+## Event types
+
+| Event | Description |
+|-------|-------------|
+| `transaction.success` | A VAS purchase or transfer completed successfully |
+| `transaction.failed` | A transaction failed |
+| `transaction.pending` | Transaction is awaiting confirmation |
+| `wallet.funded` | Your wallet was funded |
+| `wallet.debited` | Your wallet was debited |
+
+## Verifying webhook signatures
+
+Every webhook request includes an `X-Dancity-Signature` header. You **must** verify this signature to confirm the request is genuinely from Dancity and has not been tampered with.
+
+The signature is computed as:
+
+```
+HMAC-SHA256(webhookSecret, rawRequestBody)
+```
+
+Your `webhookSecret` is shown when you **first generate** your API key. Store it securely — it is not shown again.
+
+### Verification examples
+
+<CodeGroup>
+```javascript Node.js (Express)
+const crypto = require("crypto");
+
+app.post("/webhooks/dancity", express.raw({ type: "application/json" }), (req, res) => {
+  const signature = req.headers["x-dancity-signature"];
+  const secret = process.env.DANCITY_WEBHOOK_SECRET;
+
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(req.body) // raw Buffer — do NOT parse JSON before this
+    .digest("hex");
+
+  if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) {
+    return res.status(401).send("Invalid signature");
+  }
+
+  const event = JSON.parse(req.body);
+  console.log("Received event:", event.event);
+
+  // Handle the event
+  if (event.event === "transaction.success") {
+    // fulfil your order, credit your user, etc.
+  }
+
+  res.sendStatus(200);
+});
+```
+
+```python Python (Flask)
+import hmac, hashlib, os
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+
+@app.route("/webhooks/dancity", methods=["POST"])
+def dancity_webhook():
+    signature = request.headers.get("X-Dancity-Signature", "")
+    secret = os.environ["DANCITY_WEBHOOK_SECRET"].encode()
+
+    expected = hmac.new(secret, request.data, hashlib.sha256).hexdigest()
+
+    if not hmac.compare_digest(signature, expected):
+        abort(401)
+
+    event = request.get_json()
+    print(f"Received event: {event['event']}")
+
+    if event["event"] == "transaction.success":
+        pass  # handle success
+
+    return "", 200
+```
+
+```php PHP
+<?php
+$signature = $_SERVER['HTTP_X_DANCITY_SIGNATURE'] ?? '';
+$secret    = getenv('DANCITY_WEBHOOK_SECRET');
+$body      = file_get_contents('php://input');
+
+$expected = hash_hmac('sha256', $body, $secret);
+
+if (!hash_equals($expected, $signature)) {
+    http_response_code(401);
+    exit('Invalid signature');
+}
+
+$event = json_decode($body, true);
+// handle $event['event'] ...
+http_response_code(200);
+```
+</CodeGroup>
+
+<Warning>
+  Always use a **timing-safe comparison** function (e.g. `crypto.timingSafeEqual`,
+  `hmac.compare_digest`, `hash_equals`) to prevent timing attacks.
+</Warning>
+
+## Retry policy
+
+If your endpoint returns any HTTP status other than `2xx`, Dancity will retry the delivery with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 30 seconds |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 8 hours |
+
+After 5 failed attempts, the event is marked as undeliverable.
+
+## Best practices
+
+<AccordionGroup>
+  <Accordion title="Respond quickly">
+    Return a `200` response as fast as possible — ideally within 5 seconds.
+    Move any heavy processing (database writes, emails) to an async job/queue.
+  </Accordion>
+  <Accordion title="Make handlers idempotent">
+    You may receive the same event more than once due to retries. Use
+    `transactionId` or `reference` as a unique key to ensure you don't process
+    the same transaction twice.
+  </Accordion>
+  <Accordion title="Log everything">
+    Save the raw payload and the `X-Dancity-Signature` header for every incoming
+    webhook. This makes debugging failed deliveries much easier.
+  </Accordion>
+  <Accordion title="Test locally with ngrok">
+    Run `ngrok http 3000` to get a public HTTPS URL that tunnels to your local
+    server. Set that URL as your webhook URL during development.
+  </Accordion>
+</AccordionGroup>

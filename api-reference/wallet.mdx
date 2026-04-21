@@ -1,0 +1,146 @@
+---
+title: "Wallet"
+description: "Query your Dancity wallet balances"
+---
+
+## Overview
+
+Your Dancity wallet holds the funds used for all VAS purchases. Check your balance before initiating transactions to avoid insufficient funds errors.
+
+---
+
+## Get All Wallets
+
+Returns all wallets associated with your account.
+
+```http
+GET /wallet
+```
+
+### Headers
+
+| Header | Value | Required |
+|--------|-------|----------|
+| `Authorization` | `Bearer <api-key>` | ✅ |
+| `channel` | `API` | ✅ |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl https://api.dancity.app/wallet \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "channel: API"
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/wallet", {
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    channel: "API",
+  },
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+resp = requests.get(
+    "https://api.dancity.app/wallet",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "channel": "API",
+    },
+)
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Wallets retrieved",
+  "data": [
+    {
+      "_id": "6620f3a1c2b4e5d00f1a2b3c",
+      "type": "main",
+      "balance": 12500.50,
+      "currency": "NGN",
+      "isActive": true,
+      "createdAt": "2024-01-15T09:00:00.000Z"
+    },
+    {
+      "_id": "6620f3a1c2b4e5d00f1a2b3d",
+      "type": "bonus",
+      "balance": 250.00,
+      "currency": "NGN",
+      "isActive": true,
+      "createdAt": "2024-01-15T09:00:00.000Z"
+    }
+  ]
+}
+```
+
+---
+
+## Get Wallet by ID
+
+Retrieve a single wallet by its ID.
+
+```http
+GET /wallet/:id
+```
+
+### Path parameters
+
+| Parameter | Description |
+|-----------|-------------|
+| `id` | The wallet's `_id` |
+
+### Example request
+
+<CodeGroup>
+```bash cURL
+curl https://api.dancity.app/wallet/6620f3a1c2b4e5d00f1a2b3c \
+  -H "Authorization: Bearer dcy_live_xxxx..." \
+  -H "channel: API"
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/wallet/6620f3a1c2b4e5d00f1a2b3c", {
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    channel: "API",
+  },
+});
+const data = await res.json();
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "success": true,
+  "message": "Wallet retrieved",
+  "data": {
+    "_id": "6620f3a1c2b4e5d00f1a2b3c",
+    "type": "main",
+    "balance": 12500.50,
+    "currency": "NGN",
+    "isActive": true,
+    "createdAt": "2024-01-15T09:00:00.000Z"
+  }
+}
+```
+
+## Funding your wallet
+
+Wallet funding is done through the Dancity app. As an API client, you fund your main wallet through the standard funding methods available in your account (bank transfer, card, etc.) and then use the API for purchases.
+
+<Tip>
+  Check `balance` on your main wallet before every purchase to give your users
+  a clear error message instead of a failed transaction.
+</Tip>

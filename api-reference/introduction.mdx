@@ -1,7 +1,72 @@
 ---
-title: 'Introduction'
-description: 'Example section for showcasing API endpoints'
+title: "API Reference Overview"
+description: "All Dancity API endpoints in one place"
 ---
+
+## Base URL
+
+```
+https://api.dancity.app
+```
+
+## Authentication
+
+Every request requires two headers:
+
+```http
+Authorization: Bearer <your-api-key>
+channel: API
+```
+
+See the [Authentication guide](/guides/authentication) for full details.
+
+## Response format
+
+All successful responses follow this structure:
+
+```json
+{
+  "success": true,
+  "message": "Human-readable success message",
+  "data": { ... }
+}
+```
+
+Errors return:
+
+```json
+{
+  "statusCode": 400,
+  "message": "Error description",
+  "error": "Bad Request"
+}
+```
+
+## Endpoints at a glance
+
+### VAS Services
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `POST` | `/airtime/buy` | Purchase airtime |
+| `POST` | `/airtime/bulk` | Bulk airtime purchase |
+| `POST` | `/buy-data` | Purchase a data bundle |
+| `POST` | `/buy-data/bulk` | Bulk data purchase |
+| `GET` | `/electricity/validate` | Validate a meter number |
+| `POST` | `/electricity/purchase` | Pay electricity bill |
+| `GET` | `/cable/validate` | Validate a smartcard/decoder number |
+| `POST` | `/cable/purchase` | Subscribe to cable TV |
+
+### Wallet & Transactions
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/wallet` | Get all wallets |
+| `GET` | `/wallet/:id` | Get a single wallet |
+| `GET` | `/transactions` | List transactions |
+| `GET` | `/transactions/:id` | Get transaction by ID |
+| `GET` | `/transactions/stats/summary` | Get transaction statistics |
+
 
 <Note>
   If you're not looking to build API reference documentation, you can delete
