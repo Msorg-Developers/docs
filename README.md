@@ -26,19 +26,26 @@ See the [AI tools guides](/ai-tools) for tool-specific setup.
 
 ## Development
 
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
+**Plain `mint dev` on Node 25+ is unreliable** (see [mintlify/starter#116](https://github.com/mintlify/starter/issues/116)). This repo uses a small launcher.
 
-```
-npm i -g mint
-```
+From this folder (where `docs.json` is):
 
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
+```bash
+npm run dev
 ```
 
-View your local preview at `http://localhost:3000`.
+- Uses **Homebrew `node@22`** + **`npx mint@latest dev`** when `brew install node@22` is present (your default `node` can stay on v25).
+- The Mint preview may still **log** `localStorage` / `Invalid URL` in the terminal; if **http://localhost:3000** (or the printed port) loads in the browser, you can ignore that noise until Mint ships a fix.
+
+**Cleanest local preview (Docker, no Homebrew Node juggling):**
+
+```bash
+npm run dev:docker
+```
+
+Requires Docker. Binds port **3000**.
+
+Optional: `MINT_PACKAGE=mint@4.2.188 npm run dev` to pin a specific CLI version.
 
 ## Publishing changes
 

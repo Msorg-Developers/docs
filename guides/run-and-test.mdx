@@ -1,0 +1,57 @@
+---
+title: "Run & test"
+description: "Local preview, env vars, and curl against the Dancity API"
+---
+
+## Preview docs
+
+From the `docs/` directory:
+
+```bash
+npm install
+npm run dev
+```
+
+Use the **API reference** tab: pick a group (e.g. **VAS**), open an operation, and use **Try it** against `https://api.dancity.app` with real credentials, or use curl below.
+
+## Environment variables
+
+<CodeGroup>
+```bash Merchant
+export DANCITY_API_KEY='dcy_live_…'
+export DANCITY_HOST='https://api.dancity.app'
+export DANCITY_MERCHANT_PREFIX='/api/external/v1'
+```
+
+```bash App (JWT)
+export DANCITY_JWT='…'
+export DANCITY_HOST='https://api.dancity.app'
+```
+</CodeGroup>
+
+Merchant calls require an IP on your API key allowlist.
+
+## Example curl
+
+**Merchant — cable validate**
+
+```bash
+curl -sS "${DANCITY_HOST}${DANCITY_MERCHANT_PREFIX}/cable/validate?smartcardNumber=…&cableplan=…&cablename=…" \
+  -H "Authorization: Bearer ${DANCITY_API_KEY}" \
+  -H "channel: API"
+```
+
+**App — wallet**
+
+```bash
+curl -sS "${DANCITY_HOST}/api/wallet/${DANCITY_WALLET_ID}" \
+  -H "Authorization: Bearer ${DANCITY_JWT}"
+```
+
+**Local API**
+
+If the Nest app runs at `http://127.0.0.1:3000` with prefix `api`, set `DANCITY_HOST` accordingly; paths stay `/api/...`.
+
+## OpenAPI
+
+The OpenAPI file in the repo is `api-reference/openapi.json` (import into Postman or Insomnia, or use **Try it** in the **Endpoints** section).

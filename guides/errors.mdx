@@ -84,7 +84,7 @@ For validation errors, `message` may be an **array** of field-level messages:
 
 <CodeGroup>
 ```javascript Node.js
-const response = await fetch("https://api.dancity.app/airtime/buy", {
+const response = await fetch("https://api.dancity.app/api/external/v1/airtime/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -110,7 +110,7 @@ const data = await response.json();
 import requests
 
 resp = requests.post(
-    "https://api.dancity.app/airtime/buy",
+    "https://api.dancity.app/api/external/v1/airtime/buy",
     headers={
         "Authorization": f"Bearer {api_key}",
         "Content-Type": "application/json",

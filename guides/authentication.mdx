@@ -1,11 +1,22 @@
 ---
 title: "Authentication"
-description: "How to authenticate every request to the Dancity API"
+description: "How to authenticate VAS (merchant) and first-party app APIs"
 ---
 
-## Overview
+## Two credential types
 
-The Dancity API uses **Bearer token authentication**. Every request must include your API key in the `Authorization` header, plus the mandatory `channel` header that identifies where the request originates.
+| Surface | Base path | Credential | Extra headers |
+|---------|-----------|------------|---------------|
+| **VAS** (merchant) | `/api/external/v1/...` | `dcy_live_...` API key | `channel: API` (required) + IP allowlist |
+| **App API** (wallet, transactions, …) | `/api/...` | JWT from user login | No `channel` header |
+
+Do **not** send merchant API keys from mobile apps or browsers. Keep them on your backend.
+
+---
+
+## Merchant API key
+
+Every **VAS** (`/api/external/v1`) request must include:
 
 ```http
 Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
@@ -13,65 +24,72 @@ channel: API
 ```
 
 <Warning>
-  Your API key grants full access to your Dancity account. **Never expose it in
-  client-side code, public repositories, or logs.** Store it only in server-side
-  environment variables.
+  Your API key can spend wallet balance and purchase services on behalf of the linked account. **Never expose it in client-side code, public repositories, or logs.** Store it only in server-side environment variables.
 </Warning>
 
-## API Key format
-
-All Dancity live keys follow the format:
+### API key format
 
 ```
-dcy_live_<random-40-char-hex>
+dcy_live_<40-char-hex>
 ```
 
-The key is shown **only once** immediately after generation. If you lose it, you must regenerate — the old key is immediately invalidated.
+The key is shown **only once** after generation. Regenerating invalidates the previous key immediately.
 
-## Sending the Authorization header
+### Example (merchant)
 
 <CodeGroup>
 ```bash cURL
-curl https://api.dancity.app/wallet \
+curl -sS "https://api.dancity.app/api/external/v1/cable/validate?smartcardNumber=demo&cableplan=demo&cablename=demo" \
   -H "Authorization: Bearer dcy_live_xxxx..." \
   -H "channel: API"
 ```
 
 ```javascript Node.js / fetch
-fetch("https://api.dancity.app/wallet", {
-  headers: {
-    Authorization: "Bearer dcy_live_xxxx...",
-    channel: "API",
+await fetch(
+  "https://api.dancity.app/api/external/v1/data/buy",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+      "Content-Type": "application/json",
+      channel: "API",
+    },
+    body: JSON.stringify({
+      plan: "PLAN_ID",
+      phone: "08012345678",
+      wallettype: "main",
+      pin: "1234",
+    }),
   },
-});
+);
 ```
 
 ```python Python / requests
-import requests
+import os, requests
 
-requests.get(
-    "https://api.dancity.app/wallet",
+requests.post(
+    "https://api.dancity.app/api/external/v1/airtime/buy",
     headers={
-        "Authorization": "Bearer dcy_live_xxxx...",
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
         "channel": "API",
     },
+    json={
+        "product": "MTN Airtime",
+        "phone": "08012345678",
+        "amount": 500,
+        "pin": "1234",
+    },
+    timeout=60,
 )
-```
-
-```php PHP
-$ch = curl_init("https://api.dancity.app/wallet");
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Authorization: Bearer dcy_live_xxxx...",
-    "channel: API",
-]);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-$response = curl_exec($ch);
 ```
 </CodeGroup>
 
-## The `channel` header
+---
 
-The `channel` header is **required** on all requests and tells Dancity the source of the request. For API integrations, always send:
+## The `channel` header (merchant only)
+
+`channel` is **required** on `/api/external/v1/*` routes. For server integrations use:
 
 ```
 channel: API
@@ -79,55 +97,76 @@ channel: API
 
 | Value | Description |
 |-------|-------------|
-| `API` | Server-to-server integration |
+| `API` | Partner / merchant backend |
 | `WEB` | Web browser |
-| `IOS APP` | iOS mobile app |
-| `ANDROID APP` | Android mobile app |
+| `IOS APP` | iOS app |
+| `ANDROID APP` | Android app |
 | `USSD` | USSD channel |
 
-## IP Allowlist
+---
 
-For additional security, you can restrict your API key to specific IP addresses or CIDR ranges from your [profile page](https://dancity.app/profile/api-key). This requires an OTP verification when adding or changing IPs.
+## JWT (app API)
+
+First-party routes such as `GET /api/wallet/{id}` expect a normal **JWT** issued by Dancity auth flows:
+
+```http
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
+
+No `channel` header is required for these calls.
+
+```bash
+curl -sS "https://api.dancity.app/api/wallet/${DANCITY_WALLET_ID}" \
+  -H "Authorization: Bearer ${DANCITY_JWT}"
+```
+
+Use the wallet `id` from your signed-in user or app state—only that user’s wallet is returned.
+
+---
+
+## IP allowlist (merchant keys)
+
+Restrict your API key to specific IPs or CIDR ranges from your [API key page](https://dancity.app/profile/api-key). Adding or changing entries requires OTP verification.
 
 <Info>
-  **An empty IP allowlist blocks all traffic.** You must add at least one IP or
-  CIDR range after enabling the allowlist.
+  **An empty IP allowlist blocks all traffic.** Add at least one IP or CIDR before calling the VAS (merchant) API.
 </Info>
-
-**Supported formats:**
 
 | Format | Example |
 |--------|---------|
-| IPv4 single address | `203.0.113.5` |
-| IPv6 single address | `2001:db8::1` |
-| IPv4 CIDR range | `192.168.1.0/24` |
-| IPv6 CIDR range | `2001:db8::/32` |
+| IPv4 | `203.0.113.5` |
+| IPv6 | `2001:db8::1` |
+| IPv4 CIDR | `192.168.1.0/24` |
+| IPv6 CIDR | `2001:db8::/32` |
 
-Up to **20 entries** are allowed.
+Up to **20** entries.
+
+---
 
 ## Unauthorized responses
-
-If authentication fails, the API returns:
 
 ```json
 {
   "statusCode": 401,
-  "message": "Unauthorized"
+  "message": "Missing API key"
 }
 ```
 
 Common causes:
-- Missing or malformed `Authorization` header
-- Revoked or invalid API key
-- Request originated from an IP not in your allowlist
-- Your API client has been deactivated
+
+- Wrong credential type (JWT vs API key) for the route
+- Missing `channel: API` on merchant endpoints
+- IP not allowlisted
+- Revoked or rotated API key
+
+---
 
 ## Key rotation
 
-To rotate your API key:
+1. Open the [API Key page](https://dancity.app/profile/api-key)
+2. Choose **Regenerate API Key**
+3. Complete the email OTP
+4. Copy the new key once and update all servers
+5. Old keys stop working immediately
 
-1. Go to your [API Key page](https://dancity.app/profile/api-key)
-2. Click **Regenerate API Key**
-3. Enter the OTP sent to your email
-4. Copy and store the new key immediately
-5. Update all your integrations — the old key stops working instantly
+For runnable curl snippets, see [Run & test](/guides/run-and-test).

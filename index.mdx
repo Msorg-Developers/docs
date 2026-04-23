@@ -1,6 +1,6 @@
 ---
 title: "Dancity Developer Docs"
-description: "Build powerful payment and VAS integrations with the Dancity API"
+description: "Build payment and VAS integrations with the Dancity API"
 ---
 
 <img
@@ -14,157 +14,49 @@ description: "Build powerful payment and VAS integrations with the Dancity API"
   alt="Dancity API"
 />
 
-## Welcome to Dancity API
+## Welcome
 
-The Dancity API lets approved partners integrate Nigeria's leading digital payment and value-added service (VAS) platform directly into their own products.
-
-With a single API key you can:
+The Dancity HTTP API covers merchant VAS (`/api/external/v1`), in-app VAS and wallets (`/api/...` with a JWT), catalog (services, products, plans), eSIM, virtual cards, education pins, and betting. The **API reference** tab lists **one page per operation** (like PayVessel): each page pulls **Try it** and schemas from the shared [OpenAPI](https://www.openapis.org/) spec.
 
 <CardGroup cols={2}>
-  <Card title="Buy Airtime" icon="mobile" href="/api-reference/airtime">
-    Top up any Nigerian network — MTN, Airtel, Glo, 9mobile — instantly.
+  <Card title="OpenAPI + Try it" icon="brackets" href="/api-reference/introduction">
+    Base URL, auth matrix, and link to the **Endpoints** spec (interactive).
   </Card>
-  <Card title="Buy Data" icon="wifi" href="/api-reference/data">
-    Purchase data bundles for any Nigerian network at competitive rates.
+  <Card title="Run & test" icon="terminal" href="/guides/run-and-test">
+    curl, env vars, and local backend.
   </Card>
-  <Card title="Pay Electricity Bills" icon="bolt" href="/api-reference/electricity">
-    Validate meters and vend prepaid or postpaid electricity tokens instantly.
+  <Card title="Authentication" icon="key" href="/guides/authentication">
+    API keys, JWT, `channel`, IP allowlist, and webhooks.
   </Card>
-  <Card title="Pay Cable TV" icon="tv" href="/api-reference/cable">
-    Renew DStv, GOtv, and Startimes subscriptions with smartcard validation.
-  </Card>
-  <Card title="Wallet Balance" icon="wallet" href="/api-reference/wallet">
-    Query wallet balances before initiating transactions.
-  </Card>
-  <Card title="Transactions" icon="receipt" href="/api-reference/transactions">
-    Retrieve transaction history and verify payment status.
+  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+    First request in a few minutes.
   </Card>
 </CardGroup>
 
 ## Before you start
 
 <Steps>
-  <Step title="Create a Dancity account">
-    Sign up at [dancity.app](https://dancity.app) and upgrade to **Tier 3** — API access is only available to verified Tier 3 users.
+  <Step title="Dancity account (Tier 3)">
+    Sign up at [dancity.app](https://dancity.app). API access requires Tier 3 and an approved API client.
   </Step>
-  <Step title="Submit an API access request">
-    From your profile page, navigate to **API Key** and submit an access request with your business name, website, and KYC documents.
+  <Step title="API key">
+    After approval, generate a merchant key from the API Key page. **Copy once** — it is not shown again.
   </Step>
-  <Step title="Wait for approval">
-    Our team reviews requests within 1–2 business days. You'll receive an email and in-app notification when approved.
+  <Step title="Allowlist IPs / webhook">
+    Add server IPs and (optionally) an HTTPS `webhookUrl` for server-to-server events.
   </Step>
-  <Step title="Generate your API key">
-    Once approved, generate your API key from the API Key page. **Copy it immediately** — it is shown only once.
-  </Step>
-  <Step title="Make your first request">
-    Follow the [Quickstart](/guides/quickstart) guide to make your first API call in minutes.
+  <Step title="Integrate">
+    Open the [API reference](/api-reference/introduction) tab and the group for your product (e.g. **VAS** or **Wallet**). Each page matches one HTTP operation and **Try it**.
   </Step>
 </Steps>
 
 ## Base URL
 
-All API requests are made to:
-
 ```
 https://api.dancity.app
 ```
 
-## Need help?
+## Help
 
-- Email us at [support@dancity.app](mailto:support@dancity.app)
-- Read the [Authentication guide](/guides/authentication) to understand how to secure your requests
-- Explore the full [API Reference](/api-reference/overview)
-
-
-## Setting up
-
-Get your documentation site up and running in minutes.
-
-<Card
-  title="Start here"
-  icon="rocket"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
-
-## Make it yours
-
-Design a docs site that looks great and empowers your users.
-
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    icon="pen-to-square"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
-  </Card>
-  <Card
-    title="Customize your site"
-    icon="palette"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
-  </Card>
-    <Card
-    title="Set up navigation"
-    icon="map"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
-  </Card>
-  <Card
-    title="API documentation"
-    icon="terminal"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
-  </Card>
-</Columns>
-
-## Create beautiful pages
-
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    icon="pen-fancy"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    icon="code"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    icon="image"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    icon="recycle"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  icon="stars"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+- [support@dancity.app](mailto:support@dancity.app)
+- [Errors](/guides/errors) · [Webhooks](/guides/webhook) · [Rate limits](/guides/rate-limits)

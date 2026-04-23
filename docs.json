@@ -7,11 +7,47 @@
     "light": "#4A7AFF",
     "dark": "#00144C"
   },
-  "favicon": "/favicon.svg",
+  "favicon": "/favicon.png",
+  "openapi": "api-reference/openapi.json",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg",
+    "light": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
+    "dark": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
     "href": "https://dancity.app"
+  },
+  "api": {
+    "playground": {
+      "display": "interactive"
+    },
+    "examples": {
+      "languages": ["bash", "javascript", "python"],
+      "prefill": true,
+      "defaults": "all"
+    }
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:support@dancity.app"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Dashboard",
+      "href": "https://dancity.app"
+    }
+  },
+  "contextual": {
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "perplexity",
+      "mcp",
+      "cursor",
+      "vscode"
+    ]
   },
   "navigation": {
     "tabs": [
@@ -26,6 +62,7 @@
             "group": "Integration",
             "pages": [
               "guides/authentication",
+              "guides/run-and-test",
               "guides/errors",
               "guides/rate-limits",
               "guides/webhook"
@@ -34,24 +71,76 @@
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "API reference",
         "groups": [
           {
-            "group": "Getting Started",
-            "pages": ["api-reference/overview"]
+            "group": "Getting started",
+            "pages": ["api-reference/introduction"]
           },
           {
-            "group": "VAS Services",
+            "group": "Wallet",
             "pages": [
-              "api-reference/airtime",
-              "api-reference/data",
-              "api-reference/electricity",
-              "api-reference/cable"
+              "api-reference/wallet/get-api-wallet-id"
             ]
           },
           {
-            "group": "Wallet & Transactions",
-            "pages": ["api-reference/wallet", "api-reference/transactions"]
+            "group": "Products & services",
+            "pages": [
+              "api-reference/catalog/get-api-service",
+              "api-reference/catalog/get-api-products",
+              "api-reference/catalog/get-api-plans-data",
+              "api-reference/catalog/get-api-plans-cable",
+              "api-reference/catalog/get-api-internetplans"
+            ]
+          },
+          {
+            "group": "VAS",
+            "pages": [
+              "api-reference/external-v1/post-api-external-v1-data-buy",
+              "api-reference/external-v1/post-api-external-v1-airtime-buy",
+              "api-reference/external-v1/get-api-external-v1-cable-validate",
+              "api-reference/external-v1/post-api-external-v1-cable-buy",
+              "api-reference/external-v1/post-api-external-v1-electricity-validate",
+              "api-reference/external-v1/post-api-external-v1-electricity-buy",
+              "api-reference/external-v1/post-api-external-v1-internet-buy",
+              "api-reference/education/post-api-education-pin-validate-product",
+              "api-reference/education/post-api-education-pin-purchase",
+              "api-reference/betting/post-api-betting-funding"
+            ]
+          },
+          {
+            "group": "Virtual card",
+            "pages": [
+              "api-reference/virtual-card/get-api-cards",
+              "api-reference/virtual-card/post-api-cards",
+              "api-reference/virtual-card/get-api-cards-exchange-rate",
+              "api-reference/virtual-card/get-api-cards-transactions-cardId",
+              "api-reference/virtual-card/get-api-cards-cardId",
+              "api-reference/virtual-card/put-api-cards-cardId",
+              "api-reference/virtual-card/post-api-cards-wallet"
+            ]
+          },
+          {
+            "group": "eSIM",
+            "pages": [
+              "api-reference/esim/get-api-esim-regions",
+              "api-reference/esim/get-api-esim-packages",
+              "api-reference/esim/get-api-esim-topup-packages",
+              "api-reference/esim/post-api-esim-purchase",
+              "api-reference/esim/get-api-esim-my-esims",
+              "api-reference/esim/get-api-esim-details-transactionId"
+            ]
+          },
+          {
+            "group": "Transactions",
+            "pages": [
+              "api-reference/transactions/get-api-transactions",
+              "api-reference/transactions/get-api-transactions-transactionId"
+            ]
+          },
+          {
+            "group": "Webhook",
+            "pages": ["api-reference/webhooks/partner-inbound"]
           }
         ]
       }

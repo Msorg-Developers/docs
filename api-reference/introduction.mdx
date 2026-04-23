@@ -1,98 +1,33 @@
 ---
-title: "API Reference Overview"
-description: "All Dancity API endpoints in one place"
+title: "API reference"
+description: "HTTP endpoints, request/response shapes, and Try it (OpenAPI)"
 ---
 
-## Base URL
-
-```
-https://api.dancity.app
-```
-
-## Authentication
-
-Every request requires two headers:
-
-```http
-Authorization: Bearer <your-api-key>
-channel: API
-```
-
-See the [Authentication guide](/guides/authentication) for full details.
-
-## Response format
-
-All successful responses follow this structure:
-
-```json
-{
-  "success": true,
-  "message": "Human-readable success message",
-  "data": { ... }
-}
-```
-
-Errors return:
-
-```json
-{
-  "statusCode": 400,
-  "message": "Error description",
-  "error": "Bad Request"
-}
-```
-
-## Endpoints at a glance
-
-### VAS Services
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `POST` | `/airtime/buy` | Purchase airtime |
-| `POST` | `/airtime/bulk` | Bulk airtime purchase |
-| `POST` | `/buy-data` | Purchase a data bundle |
-| `POST` | `/buy-data/bulk` | Bulk data purchase |
-| `GET` | `/electricity/validate` | Validate a meter number |
-| `POST` | `/electricity/purchase` | Pay electricity bill |
-| `GET` | `/cable/validate` | Validate a smartcard/decoder number |
-| `POST` | `/cable/purchase` | Subscribe to cable TV |
-
-### Wallet & Transactions
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| `GET` | `/wallet` | Get all wallets |
-| `GET` | `/wallet/:id` | Get a single wallet |
-| `GET` | `/transactions` | List transactions |
-| `GET` | `/transactions/:id` | Get transaction by ID |
-| `GET` | `/transactions/stats/summary` | Get transaction statistics |
+Use this tab for **methods, paths, parameters, and bodies**. Concept guides (auth, webhooks, errors) live under **Guides**.
 
 
-<Note>
-  If you're not looking to build API reference documentation, you can delete
-  this section by removing the api-reference folder.
-</Note>
+<CardGroup cols={2}>
+  <Card title="Wallet" icon="wallet" href="/api-reference/wallet/get-api-wallet-id">
+    `GET` your wallet by id — JWT.
+  </Card>
+  <Card title="Products & services" icon="book" href="/api-reference/catalog/get-api-service">
+    Catalog: services, products, and plans (filter with query params) — JWT.
+  </Card>
+  <Card title="VAS" icon="key" href="/api-reference/external-v1/post-api-external-v1-data-buy">
+    Merchant API: `dcy_live_…`, `channel: API` — data, airtime, cable, electricity, internet, education, betting.
+  </Card>
+  <Card title="Virtual card" icon="credit-card" href="/api-reference/virtual-card/get-api-cards">
+    Cards, funding, card transactions — JWT.
+  </Card>
+  <Card title="eSIM" icon="sim-card" href="/api-reference/esim/get-api-esim-regions">
+    Regions, packages, purchase, details — JWT.
+  </Card>
+  <Card title="Transactions" icon="receipt" href="/api-reference/transactions/get-api-transactions">
+    Fetch your history or **requery** one by id for the latest `status`.
+  </Card>
+  <Card title="Webhook" icon="webhook" href="/api-reference/webhooks/partner-inbound">
+    Inbound events to your HTTPS URL — [verify in Guides](/guides/webhook).
+  </Card>
+</CardGroup>
 
-## Welcome
 
-There are two ways to build API documentation: [OpenAPI](https://mintlify.com/docs/api-playground/openapi/setup) and [MDX components](https://mintlify.com/docs/api-playground/mdx/configuration). For the starter kit, we are using the following OpenAPI specification.
-
-<Card
-  title="Plant Store Endpoints"
-  icon="leaf"
-  href="https://github.com/mintlify/starter/blob/main/api-reference/openapi.json"
->
-  View the OpenAPI specification file
-</Card>
-
-## Authentication
-
-All API endpoints are authenticated using Bearer tokens and picked up from the specification file.
-
-```json
-"security": [
-  {
-    "bearerAuth": []
-  }
-]
-```
