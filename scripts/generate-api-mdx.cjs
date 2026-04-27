@@ -22,7 +22,7 @@ function slugifyMethodPath(method, p) {
 
 function destFolder(apiPath) {
   if (apiPath.startsWith("/api/external/v1")) return "external-v1";
-  if (apiPath.startsWith("/api/service") || apiPath.startsWith("/api/products") || apiPath.startsWith("/api/plans") || apiPath.startsWith("/api/internetplans"))
+  if (apiPath.startsWith("/api/external/v1/services") || apiPath.startsWith("/api/products") || apiPath.startsWith("/api/plans") || apiPath.startsWith("/api/internetplans"))
     return "catalog";
   if (apiPath.startsWith("/api/wallet")) return "wallet";
   if (apiPath.startsWith("/api/transactions")) return "transactions";

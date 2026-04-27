@@ -80,6 +80,7 @@
           {
             "group": "Wallet",
             "pages": [
+              "api-reference/wallet/get-api-wallet",
               "api-reference/wallet/get-api-wallet-id"
             ]
           },
@@ -87,10 +88,11 @@
             "group": "Products & services",
             "pages": [
               "api-reference/catalog/get-api-service",
+              "api-reference/catalog/get-api-service-id",
               "api-reference/catalog/get-api-products",
+              "api-reference/catalog/get-api-products-id",
               "api-reference/catalog/get-api-plans-data",
-              "api-reference/catalog/get-api-plans-cable",
-              "api-reference/catalog/get-api-internetplans"
+              "api-reference/catalog/get-api-plans-cable"
             ]
           },
           {

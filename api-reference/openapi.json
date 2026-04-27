@@ -657,7 +657,7 @@
         }
       }
     },
-    "/api/transactions": {
+    "/api/external/v1/transactions": {
       "get": {
         "tags": [
           "Transactions"
@@ -666,7 +666,7 @@
         "description": "Fetch the authenticated user’s transactions. Use `page`, `limit`, date range, `status`, `service`, `tranxType`, and other query params to filter. For a single row and up-to-date status, use `GET /api/transactions/{transactionId}`.",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -763,16 +763,16 @@
         }
       }
     },
-    "/api/service": {
+    "/api/external/v1/services": {
       "get": {
         "tags": [
           "Products & services"
         ],
         "summary": "Get services",
-        "description": "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/service/{id}` is still supported for the same by-id result.",
+        "description": "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/external/v1/services/{id}` is still supported for the same by-id result.",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -823,207 +823,7 @@
         }
       }
     },
-    "/api/products": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get products",
-        "description": "Fetch products with optional filters. `GET /api/products` and the legacy `GET /api/products/product` path are the same handler.",
-        "security": [
-          {
-            "JwtAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "service",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/plans/data": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get data plans",
-        "description": "Filter data plans with query parameters (product, plan id, promos, bucket plans, etc.).",
-        "security": [
-          {
-            "JwtAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "planId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "product",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "isHotDeal",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "isbucketplan",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/plans/cable": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get cable plans",
-        "description": "Filter cable plans by `cableplanId` and `product` as needed.",
-        "security": [
-          {
-            "JwtAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "cableplanId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "product",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/internetplans": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get internet plans",
-        "description": "Filter internet plans with `internetid`, `product`, and optional `action=FILTER` when applicable.",
-        "security": [
-          {
-            "JwtAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "internetid",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "product",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "action",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "enum": [
-                "FILTER"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/wallet/{id}": {
-      "get": {
-        "tags": [
-          "Wallet"
-        ],
-        "summary": "Get wallet",
-        "description": "Returns the wallet for the authenticated user. Use the wallet id from your app's user or session context.",
-        "security": [
-          {
-            "JwtAuth": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        }
-      }
-    },
-    "/api/transactions/{transactionId}": {
+    "/api/external/v1/transactions/{transactionId}": {
       "get": {
         "tags": [
           "Transactions"
@@ -1032,7 +832,7 @@
         "description": "Return one transaction and its current `status` by Mongo `_id` or by `tranxId`. Use to requery after a purchase or for polling. Typical `status` values include `SUCCESS`, `FAILED`, `PROCESSING`, `PENDING`, `CANCELLED`.",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1053,7 +853,7 @@
         }
       }
     },
-    "/api/betting/funding": {
+    "/api/external/v1/betting/funding": {
       "post": {
         "tags": [
           "Betting"
@@ -1061,7 +861,7 @@
         "summary": "Fund betting account",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1123,7 +923,7 @@
         }
       }
     },
-    "/api/education-pin/purchase": {
+    "/api/external/v1/education-pin/purchase": {
       "post": {
         "tags": [
           "Education"
@@ -1131,7 +931,7 @@
         "summary": "Purchase education pin",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1185,7 +985,7 @@
         }
       }
     },
-    "/api/education-pin/validate-product": {
+    "/api/external/v1/education-pin/validate-product": {
       "post": {
         "tags": [
           "Education"
@@ -1193,7 +993,7 @@
         "summary": "Validate education product / pricing",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -1224,7 +1024,7 @@
         }
       }
     },
-    "/api/esim/regions": {
+    "/api/external/v1/esim/regions": {
       "get": {
         "tags": [
           "eSIM"
@@ -1232,7 +1032,7 @@
         "summary": "eSIM regions",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1252,7 +1052,7 @@
         }
       }
     },
-    "/api/esim/packages": {
+    "/api/external/v1/esim/packages": {
       "get": {
         "tags": [
           "eSIM"
@@ -1260,7 +1060,7 @@
         "summary": "eSIM packages for region",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1299,7 +1099,7 @@
         }
       }
     },
-    "/api/esim/topup-packages": {
+    "/api/external/v1/esim/topup-packages": {
       "get": {
         "tags": [
           "eSIM"
@@ -1307,7 +1107,7 @@
         "summary": "Top-up packages for ICCID",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1327,7 +1127,7 @@
         }
       }
     },
-    "/api/esim/purchase": {
+    "/api/external/v1/esim/purchase": {
       "post": {
         "tags": [
           "eSIM"
@@ -1335,7 +1135,7 @@
         "summary": "Purchase eSIM",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1396,7 +1196,7 @@
         }
       }
     },
-    "/api/esim/my-esims": {
+    "/api/external/v1/esim/my-esims": {
       "get": {
         "tags": [
           "eSIM"
@@ -1404,7 +1204,7 @@
         "summary": "List user eSIMs",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1430,7 +1230,7 @@
         }
       }
     },
-    "/api/esim/details/{transactionId}": {
+    "/api/external/v1/esim/details/{transactionId}": {
       "get": {
         "tags": [
           "eSIM"
@@ -1438,7 +1238,7 @@
         "summary": "eSIM details for transaction",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1458,7 +1258,7 @@
         }
       }
     },
-    "/api/cards": {
+    "/api/external/v1/cards": {
       "get": {
         "tags": [
           "Virtual card"
@@ -1466,7 +1266,7 @@
         "summary": "List virtual cards",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "responses": {
@@ -1482,7 +1282,7 @@
         "summary": "Create virtual card",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -1502,7 +1302,7 @@
         }
       }
     },
-    "/api/cards/exchange-rate": {
+    "/api/external/v1/cards/exchange-rate": {
       "get": {
         "tags": [
           "Virtual card"
@@ -1510,7 +1310,7 @@
         "summary": "Card USD/FX rates",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "responses": {
@@ -1520,7 +1320,7 @@
         }
       }
     },
-    "/api/cards/transactions/{cardId}": {
+    "/api/external/v1/cards/transactions/{cardId}": {
       "get": {
         "tags": [
           "Virtual card"
@@ -1528,7 +1328,7 @@
         "summary": "Card transactions",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1562,7 +1362,7 @@
         }
       }
     },
-    "/api/cards/wallet": {
+    "/api/external/v1/cards/wallet": {
       "post": {
         "tags": [
           "Virtual card"
@@ -1570,7 +1370,7 @@
         "summary": "Fund or withdraw from card",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -1590,7 +1390,7 @@
         }
       }
     },
-    "/api/cards/{cardId}": {
+    "/api/external/v1/cards/{cardId}": {
       "get": {
         "tags": [
           "Virtual card"
@@ -1598,7 +1398,7 @@
         "summary": "Get card by ID",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1624,7 +1424,7 @@
         "summary": "Update card",
         "security": [
           {
-            "JwtAuth": []
+            "DancityApiKey": []
           }
         ],
         "parameters": [
@@ -1657,10 +1457,10 @@
     "/api/external/v1/wallet": {
       "get": {
         "tags": [
-          "VAS"
+          "Wallet"
         ],
-        "summary": "Wallets and balances (merchant, API key)",
-        "description": "Same data as app `GET /api/wallet`: wallets and balances for the user linked to this API key.",
+        "summary": "Get wallets",
+        "description": "Returns all wallets and balances for the user linked to this API key.",
         "security": [
           {
             "DancityApiKey": []
@@ -1725,78 +1525,12 @@
         }
       }
     },
-    "/api/external/v1/services": {
-      "get": {
-        "tags": [
-          "VAS"
-        ],
-        "summary": "List/filter services (merchant, API key)",
-        "description": "Same filters as app `GET /api/service` (`id`, `name`, `disable`, ...).",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "name",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "disable",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "displayonmenu",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "isutility",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key or IP not allowlisted"
-          }
-        }
-      }
-    },
     "/api/external/v1/services/{id}": {
       "get": {
         "tags": [
-          "VAS"
+          "Products & services"
         ],
-        "summary": "Service by id (merchant, API key)",
+        "summary": "Get service by ID",
         "security": [
           {
             "DancityApiKey": []
@@ -1832,10 +1566,10 @@
     "/api/external/v1/products": {
       "get": {
         "tags": [
-          "VAS"
+          "Products & services"
         ],
-        "summary": "Products available to buy (merchant, API key)",
-        "description": "Filter with `productId`, `name`, or `service` (service name) like `GET /api/products`.",
+        "summary": "Get products",
+        "description": "Filter products with `productId`, `name`, or `service` (service name).",
         "security": [
           {
             "DancityApiKey": []
@@ -1881,13 +1615,55 @@
         }
       }
     },
+    "/api/external/v1/products/{productId}": {
+      "get": {
+        "tags": [
+          "Products & services"
+        ],
+        "summary": "Get product by ID",
+        "description": "Returns a single product by its Mongo `_id`.",
+        "security": [
+          {
+            "DancityApiKey": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API key or IP not allowlisted"
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
     "/api/external/v1/plans/data": {
       "get": {
         "tags": [
-          "VAS"
+          "Products & services"
         ],
-        "summary": "Data plans (merchant, API key)",
-        "description": "Filter by `product`, `planId`, `isHotDeal`, `isbucketplan` — same as app `GET /api/plans/data`.",
+        "summary": "Get data plans",
+        "description": "Filter by `product`, `planId`, `isHotDeal`, `isbucketplan`.",
         "security": [
           {
             "DancityApiKey": []
@@ -1943,10 +1719,10 @@
     "/api/external/v1/plans/cable": {
       "get": {
         "tags": [
-          "VAS"
+          "Products & services"
         ],
-        "summary": "Cable plans (merchant, API key)",
-        "description": "Filter with `cableplanId` and `product` like `GET /api/plans/cable`.",
+        "summary": "Get cable plans",
+        "description": "Filter with `cableplanId` and `product`.",
         "security": [
           {
             "DancityApiKey": []
@@ -1988,10 +1764,10 @@
     "/api/external/v1/plans/internet": {
       "get": {
         "tags": [
-          "VAS"
+          "Products & services"
         ],
-        "summary": "Internet plans (merchant, API key)",
-        "description": "Filter with `internetid`, `product`, `action` like `GET /api/internetplans`.",
+        "summary": "Get internet plans",
+        "description": "Filter with `internetid`, `product`, `action`.",
         "security": [
           {
             "DancityApiKey": []

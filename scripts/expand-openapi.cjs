@@ -49,12 +49,12 @@ const ok = {
 };
 
 const extraPaths = {
-  "/api/service": {
+  "/api/external/v1/services": {
     get: {
       tags: ["Products & services"],
       summary: "Get services",
       description:
-        "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/service/{id}` is still supported for the same by-id result.",
+        "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/external/v1/services/{id}` is still supported for the same by-id result.",
       security: jwt,
       parameters: [
         { name: "id", in: "query", description: "Optional. Service Mongo id — when set, response is a single `service` object.", schema: { type: "string" } },
@@ -416,7 +416,7 @@ const extraPaths = {
     get: {
       tags: ["VAS"],
       summary: "List/filter services (merchant, API key)",
-      description: "Same filters as app `GET /api/service` (`id`, `name`, `disable`, ...).",
+      description: "Same filters as app `GET /api/external/v1/services` (`id`, `name`, `disable`, ...).",
       security: extKey,
       parameters: [
         { name: "id", in: "query", schema: { type: "string" } },
