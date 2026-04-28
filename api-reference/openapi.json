@@ -295,51 +295,82 @@
         }
       }
     },
-    "/api/external/v1/cable/validate": {
-      "get": {
+    "/api/external/v1/validate": {
+      "post": {
         "tags": [
           "VAS"
         ],
-        "summary": "Validate cable smartcard",
+        "summary": "Validate cable smartcard or electricity meter (merchant)",
+        "description": "Single validation endpoint for external merchants. Set `type` to `\"cable\"` or `\"electricity\"`.",
         "security": [
           {
             "DancityApiKey": [],
             "ChannelHeader": []
           }
         ],
-        "parameters": [
-          {
-            "name": "smartcardNumber",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "cableplan",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "cablename",
-            "in": "query",
-            "required": true,
-            "schema": {
-              "type": "string"
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["type"],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": ["cable", "electricity"],
+                    "description": "Validation type"
+                  },
+                  "smartcardNumber": {
+                    "type": "string",
+                    "description": "Required when type is cable"
+                  },
+                  "cablename": {
+                    "type": "string",
+                    "description": "Required when type is cable"
+                  },
+                  "meterNumber": {
+                    "type": "string",
+                    "description": "Required when type is electricity"
+                  },
+                  "billerName": {
+                    "type": "string",
+                    "description": "Required when type is electricity"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "description": "Required when type is electricity"
+                  },
+                  "meterType": {
+                    "type": "string",
+                    "enum": ["prepaid", "postpaid"],
+                    "description": "Required when type is electricity"
+                  }
+                }
+              },
+              "examples": {
+                "Validate cable smartcard": {
+                  "value": {
+                    "type": "cable",
+                    "smartcardNumber": "1234567890",
+                    "cablename": "DSTV"
+                  }
+                }
+              }
             }
           }
-        ],
+        },
         "responses": {
           "200": {
-            "description": "OK",
+            "description": "Validation successful",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Validation successful",
+                  "data": {
+                    "customerName": "John Doe"
+                  }
                 }
               }
             }
@@ -421,64 +452,6 @@
                 }
               }
             }
-          },
-          "401": {
-            "description": "Unauthorized"
-          }
-        }
-      }
-    },
-    "/api/external/v1/electricity/validate": {
-      "post": {
-        "tags": [
-          "VAS"
-        ],
-        "summary": "Validate electricity meter",
-        "security": [
-          {
-            "DancityApiKey": [],
-            "ChannelHeader": []
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "meterNumber",
-                  "billerName",
-                  "amount",
-                  "meterType"
-                ],
-                "properties": {
-                  "meterNumber": {
-                    "type": "string"
-                  },
-                  "billerName": {
-                    "type": "string",
-                    "example": "IKEDC"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "example": 1000
-                  },
-                  "meterType": {
-                    "type": "string",
-                    "enum": [
-                      "prepaid",
-                      "postpaid"
-                    ]
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "Validation result from provider"
           },
           "401": {
             "description": "Unauthorized"
@@ -1459,7 +1432,7 @@
         "tags": [
           "Wallet"
         ],
-        "summary": "Get wallets",
+        "summary": "Get wallets balance",
         "description": "Returns all wallets and balances for the user linked to this API key.",
         "security": [
           {
@@ -1525,44 +1498,6 @@
         }
       }
     },
-    "/api/external/v1/services/{id}": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get service by ID",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key or IP not allowlisted"
-          }
-        }
-      }
-    },
     "/api/external/v1/products": {
       "get": {
         "tags": [
@@ -1611,48 +1546,6 @@
           },
           "401": {
             "description": "Invalid API key or IP not allowlisted"
-          }
-        }
-      }
-    },
-    "/api/external/v1/products/{productId}": {
-      "get": {
-        "tags": [
-          "Products & services"
-        ],
-        "summary": "Get product by ID",
-        "description": "Returns a single product by its Mongo `_id`.",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "productId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Invalid API key or IP not allowlisted"
-          },
-          "404": {
-            "description": "Not found"
           }
         }
       }

@@ -1,0 +1,246 @@
+---
+title: "Electricity"
+description: "Validate a meter number and vend electricity tokens"
+---
+
+## Overview
+
+Electricity purchases follow a two-step flow:
+
+1. **Validate** the meter number to confirm it's active and retrieve the customer name
+2. **Buy** units (prepaid token) or pay a postpaid bill
+
+Supported DISCOs include IKEDC, EKEDC, AEDC, PHEDC, and others.
+
+## Authentication
+
+Both endpoints require your merchant API key **and** the `channel: API` header.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+channel: API
+```
+
+---
+
+## Step 1 — Validate meter
+
+```
+POST /api/external/v1/validate
+```
+
+Send `type: "electricity"` to validate a meter number.
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | ✓ | Must be `"electricity"` |
+| `meterNumber` | string | ✓ | Customer's meter number |
+| `billerName` | string | ✓ | DISCO name (e.g., `"IKEDC"`, `"EKEDC"`) |
+| `amount` | number | ✓ | Intended vend amount in NGN (for pricing context) |
+| `meterType` | string | ✓ | `"prepaid"` or `"postpaid"` |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/validate" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "type": "electricity",
+    "meterNumber": "45012345678",
+    "billerName": "IKEDC",
+    "amount": 2000,
+    "meterType": "prepaid"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    type: "electricity",
+    meterNumber: "45012345678",
+    billerName: "IKEDC",
+    amount: 2000,
+    meterType: "prepaid",
+  }),
+});
+const { data } = await res.json();
+console.log(data.customerName); // display to user
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/validate",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "type": "electricity",
+        "meterNumber": "45012345678",
+        "billerName": "IKEDC",
+        "amount": 2000,
+        "meterType": "prepaid",
+    },
+)
+customer_name = res.json()["data"]["customerName"]
+```
+</CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Validation successful",
+  "data": {
+    "customerName": "Jane Doe"
+  }
+}
+```
+
+<Info>
+  Always show `customerName` to the user before proceeding to purchase — it confirms the meter number is correct.
+</Info>
+
+---
+
+## Step 2 — Buy electricity
+
+```
+POST /api/external/v1/electricity/buy
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `meterNumber` | string | ✓ | Same number used in validation |
+| `meterType` | string | ✓ | `"prepaid"` or `"postpaid"` |
+| `amount` | number | ✓ | Vend amount in NGN (minimum ₦500) |
+| `customerName` | string | ✓ | Name returned from validation |
+| `address` | string | ✓ | Customer's address |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `billerName` | string | | DISCO name |
+| `billerCode` | string | | Mongo ObjectId of the biller (optional) |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save meter as beneficiary |
+| `promocode` | string | | Discount promo code |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/electricity/buy" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "meterNumber": "45012345678",
+    "meterType": "prepaid",
+    "amount": 2000,
+    "customerName": "Jane Doe",
+    "address": "12 Lekki Phase 1, Lagos",
+    "billerName": "IKEDC",
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/electricity/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    meterNumber: "45012345678",
+    meterType: "prepaid",
+    amount: 2000,
+    customerName: "Jane Doe",
+    address: "12 Lekki Phase 1, Lagos",
+    billerName: "IKEDC",
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/electricity/buy",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "meterNumber": "45012345678",
+        "meterType": "prepaid",
+        "amount": 2000,
+        "customerName": "Jane Doe",
+        "address": "12 Lekki Phase 1, Lagos",
+        "billerName": "IKEDC",
+        "pin": "1234",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+### Sample response (prepaid)
+
+```json
+{
+  "success": true,
+  "message": "Electricity purchase successful",
+  "data": {
+    "transactionId": "TXN-2025-XXXXX",
+    "token": "1234-5678-9012-3456-7890",
+    "units": "12.50",
+    "amount": 2000,
+    "meterNumber": "45012345678"
+  }
+}
+```
+
+<Tip>
+  For prepaid meters, the `token` field in the response is the recharge token to give the customer. Store it with the transaction record.
+</Tip>
+
+---
+
+## Full purchase flow
+
+```
+1. Collect meterNumber, meterType, billerName from user
+
+2. POST /api/external/v1/validate  { type: "electricity", ... }
+   → confirm customerName
+
+3. Show customerName to user → user confirms
+
+4. POST /api/external/v1/electricity/buy
+   → send meterNumber, meterType, amount, customerName, address, pin
+```
+
+<Warning>
+  The minimum vend amount is **₦500**. Requests below this threshold return a `400` validation error.
+</Warning>
+
+## Next steps
+
+- [Transactions: verify purchase status](/guides/transactions)
+- [Webhooks: receive token delivery confirmation](/guides/webhook)

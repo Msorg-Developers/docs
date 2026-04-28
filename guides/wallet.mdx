@@ -1,0 +1,102 @@
+---
+title: "Wallet"
+description: "Check your Dancity wallet balances via the merchant API"
+---
+
+## Overview
+
+Every Dancity merchant account has one or more wallets (e.g., **main**, **bonus**). Your API key is tied to a specific account, so calling the wallet endpoint always returns balances for that account.
+
+Use wallet balances to:
+- Display a live balance before processing a purchase
+- Check which wallet type (`wallettype`) to pass in a buy request
+- Detect low-balance conditions and alert your team
+
+## Authentication
+
+Wallet reads use your **merchant API key** only — no `channel: API` header is required for this endpoint.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+## Get wallets balance
+
+```
+GET /api/external/v1/wallet
+```
+
+Returns all wallets linked to the API key's account, including their types and current balances.
+
+### Example
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/wallet" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/wallet", {
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+  },
+});
+const { data } = await res.json();
+console.log(data); // array of wallet objects
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/wallet",
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Wallets retrieved",
+  "data": [
+    {
+      "wallettype": "main",
+      "balance": 15000.00,
+      "currency": "NGN"
+    },
+    {
+      "wallettype": "bonus",
+      "balance": 250.00,
+      "currency": "NGN"
+    }
+  ]
+}
+```
+
+## Using wallet types in purchases
+
+Most buy endpoints accept a `wallettype` field. Use the `wallettype` values returned here — typically `"main"` — unless you specifically want to spend a bonus balance.
+
+```json
+{
+  "plan": "PLAN_ID",
+  "phone": "08012345678",
+  "wallettype": "main",
+  "pin": "1234"
+}
+```
+
+<Warning>
+  If your balance is insufficient for the purchase amount, the API returns a `400` error with a message indicating low balance. Always check balances before bulk purchase flows.
+</Warning>
+
+## Next steps
+
+- [Buy airtime or data](/guides/airtime-data)
+- [Buy cable TV subscription](/guides/cable-tv)
+- [Vend electricity](/guides/electricity)

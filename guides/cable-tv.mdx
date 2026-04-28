@@ -1,0 +1,207 @@
+---
+title: "Cable TV"
+description: "Validate a smartcard and renew a cable TV subscription"
+---
+
+## Overview
+
+Cable TV purchases are a two-step flow:
+
+1. **Validate** the smartcard number to confirm it exists and retrieve the customer name
+2. **Buy** the subscription using the validated details
+
+Supported providers include DSTV, GOtv, Startimes, and others available in your catalog.
+
+## Authentication
+
+Both endpoints require your merchant API key **and** the `channel: API` header.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+channel: API
+```
+
+---
+
+## Step 1 — Validate smartcard
+
+```
+POST /api/external/v1/validate
+```
+
+Send `type: "cable"` to validate a cable smartcard.
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `type` | string | ✓ | Must be `"cable"` |
+| `smartcardNumber` | string | ✓ | Customer's smartcard/decoder number |
+| `cablename` | string | ✓ | Provider name (e.g., `"DSTV"`, `"GOtv"`) |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/validate" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "type": "cable",
+    "smartcardNumber": "1234567890",
+    "cablename": "DSTV"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    type: "cable",
+    smartcardNumber: "1234567890",
+    cablename: "DSTV",
+  }),
+});
+const { data } = await res.json();
+console.log(data.customerName); // show to user for confirmation
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/validate",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={"type": "cable", "smartcardNumber": "1234567890", "cablename": "DSTV"},
+)
+customer_name = res.json()["data"]["customerName"]
+```
+</CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Validation successful",
+  "data": {
+    "customerName": "John Doe"
+  }
+}
+```
+
+<Info>
+  Always display `customerName` to the user for confirmation before proceeding to purchase. This prevents funding the wrong decoder.
+</Info>
+
+---
+
+## Step 2 — Buy cable subscription
+
+```
+POST /api/external/v1/cable/buy
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `smartcardNumber` | string | ✓ | Same number used in validation |
+| `cableplan` | string | ✓ | Plan name from `GET /plans/cable` |
+| `cablename` | string | ✓ | Provider name (e.g., `"DSTV"`) |
+| `customerName` | string | ✓ | Name returned from validation step |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save smartcard as beneficiary |
+| `beneficiaryName` | string | | Label for saved beneficiary |
+| `promocode` | string | | Discount promo code |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/cable/buy" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "smartcardNumber": "1234567890",
+    "cableplan": "DStv Compact",
+    "cablename": "DSTV",
+    "customerName": "John Doe",
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/cable/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    smartcardNumber: "1234567890",
+    cableplan: "DStv Compact",
+    cablename: "DSTV",
+    customerName: "John Doe", // from validation response
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/cable/buy",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "smartcardNumber": "1234567890",
+        "cableplan": "DStv Compact",
+        "cablename": "DSTV",
+        "customerName": "John Doe",
+        "pin": "1234",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+---
+
+## Full purchase flow
+
+```
+1. GET /api/external/v1/plans/cable
+   → list available plans and their names
+
+2. POST /api/external/v1/validate  { type: "cable", smartcardNumber, cablename }
+   → confirm customer identity
+
+3. Show customerName to user → user confirms
+
+4. POST /api/external/v1/cable/buy
+   → send smartcardNumber, cableplan, cablename, customerName, pin
+```
+
+<Warning>
+  Do not proceed to purchase if the validation step fails. An invalid smartcard number will result in a failed transaction that may still debit your wallet.
+</Warning>
+
+## Next steps
+
+- [Catalog: browse cable plans](/guides/catalog)
+- [Transactions: verify purchase status](/guides/transactions)

@@ -1,0 +1,215 @@
+---
+title: "Airtime & data"
+description: "Top up a phone number with airtime or a mobile data bundle"
+---
+
+## Overview
+
+The airtime and data endpoints let you recharge any Nigerian phone number directly from your Dancity wallet. Both follow the same pattern:
+
+1. Fetch the product/plan from the [catalog](/guides/catalog)
+2. Call the buy endpoint with the product name or plan ID
+
+## Authentication
+
+Both endpoints require your merchant API key **and** the `channel: API` header.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+channel: API
+```
+
+---
+
+## Buy airtime
+
+```
+POST /api/external/v1/airtime/buy
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✓ | Product name from catalog (e.g., `"MTN Airtime"`) |
+| `phone` | string | ✓ | 11-digit Nigerian phone number |
+| `amount` | number | ✓ | Amount in NGN (₦50 – ₦1,000) |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save phone as beneficiary |
+| `beneficiaryName` | string | | Label for saved beneficiary |
+| `promocode` | string | | Discount promo code |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/airtime/buy" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "product": "MTN Airtime",
+    "phone": "08012345678",
+    "amount": 200,
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/airtime/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    product: "MTN Airtime",
+    phone: "08012345678",
+    amount: 200,
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/airtime/buy",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "product": "MTN Airtime",
+        "phone": "08012345678",
+        "amount": 200,
+        "pin": "1234",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Airtime purchase successful",
+  "data": {
+    "transactionId": "TXN-2025-XXXXX",
+    "tranxId": "dcy_ref_xxxxxxxx",
+    "status": "SUCCESS",
+    "amount": 200,
+    "phone": "08012345678",
+    "product": "MTN Airtime"
+  }
+}
+```
+
+---
+
+## Buy data bundle
+
+```
+POST /api/external/v1/data/buy
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `plan` | string | ✓ | Plan `_id` from `GET /plans/data` |
+| `phone` | string | ✓ | 11-digit Nigerian phone number |
+| `wallettype` | string | ✓ | Wallet to debit (e.g., `"main"`) |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save phone as beneficiary |
+| `promocode` | string | | Discount promo code |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/data/buy" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "plan": "64f1a2b3c4d5e6f7a8b9c0d1",
+    "phone": "08012345678",
+    "wallettype": "main",
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/data/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    plan: "64f1a2b3c4d5e6f7a8b9c0d1", // from GET /plans/data
+    phone: "08012345678",
+    wallettype: "main",
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/data/buy",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "plan": "64f1a2b3c4d5e6f7a8b9c0d1",
+        "phone": "08012345678",
+        "wallettype": "main",
+        "pin": "1234",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+---
+
+## Full purchase flow
+
+```
+1. GET /api/external/v1/products?service=Data
+   → pick your product (e.g., "MTN Data")
+
+2. GET /api/external/v1/plans/data?product=MTN%20Data
+   → pick a plan, note its _id
+
+3. GET /api/external/v1/wallet
+   → confirm sufficient balance
+
+4. POST /api/external/v1/data/buy
+   → send plan._id, phone, wallettype, pin
+```
+
+<Tip>
+  Save `data.tranxId` from the response — use it with `GET /api/external/v1/transactions/{transactionId}` to requery the status if the response is slow or unclear.
+</Tip>
+
+<Warning>
+  The airtime `amount` is capped at **₦1,000 per transaction**. For larger top-ups, split into multiple requests.
+</Warning>
+
+## Next steps
+
+- [Catalog: browse services and plans](/guides/catalog)
+- [Transactions: requery a purchase](/guides/transactions)

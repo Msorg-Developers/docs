@@ -1,0 +1,157 @@
+---
+title: "Internet"
+description: "Purchase broadband and fixed internet bundles for an account"
+---
+
+## Overview
+
+The internet buy endpoint lets you purchase internet bundles for a customer's account ID (router/device). Unlike mobile data, internet plans are tied to a fixed account rather than a phone number.
+
+## Authentication
+
+Requires your merchant API key **and** the `channel: API` header.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+channel: API
+```
+
+---
+
+## Get internet plans
+
+Before purchasing, fetch available plans from the catalog.
+
+```
+GET /api/external/v1/plans/internet
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/plans/internet" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/plans/internet",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data = [{ _id: "...", name: "Spectranet 10GB", amount: 3500 }, ...]
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/plans/internet",
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+---
+
+## Buy internet bundle
+
+```
+POST /api/external/v1/internet/buy
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `plan` | string | ✓ | Plan `_id` from `GET /plans/internet` |
+| `accountid` | string | ✓ | Customer's account/device ID |
+| `phone` | string | ✓ | Contact phone number |
+| `pin` | string | ✓ | 5-digit Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save account as beneficiary |
+| `beneficiaryName` | string | | Label for saved beneficiary |
+| `promocode` | string | | Discount promo code |
+
+<Info>
+  The `pin` for internet purchases is **5 digits**, unlike the 4-digit PIN used for airtime and data.
+</Info>
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/internet/buy" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "plan": "64f1a2b3c4d5e6f7a8b9c0d2",
+    "accountid": "SN1234567",
+    "phone": "08012345678",
+    "pin": "12345"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/internet/buy", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+    channel: "API",
+  },
+  body: JSON.stringify({
+    plan: "64f1a2b3c4d5e6f7a8b9c0d2", // from GET /plans/internet
+    accountid: "SN1234567",
+    phone: "08012345678",
+    pin: "12345",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/internet/buy",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={
+        "plan": "64f1a2b3c4d5e6f7a8b9c0d2",
+        "accountid": "SN1234567",
+        "phone": "08012345678",
+        "pin": "12345",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+---
+
+## Full purchase flow
+
+```
+1. GET /api/external/v1/plans/internet
+   → pick a plan, note its _id
+
+2. Collect accountid and phone from your user
+
+3. GET /api/external/v1/wallet
+   → confirm sufficient balance
+
+4. POST /api/external/v1/internet/buy
+   → send plan._id, accountid, phone, pin
+```
+
+<Warning>
+  The `accountid` is provider-specific. Make sure you're sending the correct identifier format for the chosen internet provider. An incorrect account ID will cause the purchase to fail.
+</Warning>
+
+## Next steps
+
+- [Catalog: browse internet plans](/guides/catalog)
+- [Transactions: requery a purchase](/guides/transactions)

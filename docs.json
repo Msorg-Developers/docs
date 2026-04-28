@@ -67,6 +67,37 @@
               "guides/rate-limits",
               "guides/webhook"
             ]
+          },
+          {
+            "group": "Wallet",
+            "pages": ["guides/wallet"]
+          },
+          {
+            "group": "Products & services",
+            "pages": ["guides/catalog"]
+          },
+          {
+            "group": "VAS",
+            "pages": [
+              "guides/airtime-data",
+              "guides/cable-tv",
+              "guides/electricity",
+              "guides/internet",
+              "guides/education-pins",
+              "guides/betting"
+            ]
+          },
+          {
+            "group": "Virtual card",
+            "pages": ["guides/virtual-card"]
+          },
+          {
+            "group": "eSIM",
+            "pages": ["guides/esim"]
+          },
+          {
+            "group": "Transactions",
+            "pages": ["guides/transactions"]
           }
         ]
       },
@@ -80,17 +111,14 @@
           {
             "group": "Wallet",
             "pages": [
-              "api-reference/wallet/get-api-wallet",
-              "api-reference/wallet/get-api-wallet-id"
+              "api-reference/wallet/get-api-wallet"
             ]
           },
           {
             "group": "Products & services",
             "pages": [
               "api-reference/catalog/get-api-service",
-              "api-reference/catalog/get-api-service-id",
               "api-reference/catalog/get-api-products",
-              "api-reference/catalog/get-api-products-id",
               "api-reference/catalog/get-api-plans-data",
               "api-reference/catalog/get-api-plans-cable"
             ]
@@ -100,9 +128,8 @@
             "pages": [
               "api-reference/external-v1/post-api-external-v1-data-buy",
               "api-reference/external-v1/post-api-external-v1-airtime-buy",
-              "api-reference/external-v1/get-api-external-v1-cable-validate",
+              "api-reference/external-v1/post-api-external-v1-validate",
               "api-reference/external-v1/post-api-external-v1-cable-buy",
-              "api-reference/external-v1/post-api-external-v1-electricity-validate",
               "api-reference/external-v1/post-api-external-v1-electricity-buy",
               "api-reference/external-v1/post-api-external-v1-internet-buy",
               "api-reference/education/post-api-education-pin-validate-product",

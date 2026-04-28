@@ -1,0 +1,268 @@
+---
+title: "Virtual cards"
+description: "Create and manage USD virtual cards for online payments"
+---
+
+## Overview
+
+Dancity virtual cards are USD-denominated cards you can use for international online purchases. Each card is linked to your Dancity account and can be funded, frozen, unfrozen, and queried via the API.
+
+Key operations:
+
+| Action | Endpoint |
+|--------|----------|
+| List cards | `GET /api/external/v1/cards` |
+| Create card | `POST /api/external/v1/cards` |
+| Get FX rate | `GET /api/external/v1/cards/exchange-rate` |
+| Fund / withdraw | `POST /api/external/v1/cards/wallet` |
+| Card transactions | `GET /api/external/v1/cards/transactions/{cardId}` |
+| Card details | `GET /api/external/v1/cards/{cardId}` |
+| Freeze / update | `PUT /api/external/v1/cards/{cardId}` |
+
+## Authentication
+
+All virtual card endpoints use your merchant API key only.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## Check exchange rate
+
+Before creating or funding a card, fetch the current NGN/USD rate.
+
+```
+GET /api/external/v1/cards/exchange-rate
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/cards/exchange-rate" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/cards/exchange-rate",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data.rate → e.g., 1600 (NGN per 1 USD)
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/cards/exchange-rate",
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+---
+
+## Create a virtual card
+
+```
+POST /api/external/v1/cards
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/cards" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{}'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/cards", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({}),
+});
+const { data } = await res.json();
+const cardId = data._id; // save for future operations
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/cards",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+    },
+    json={},
+)
+card_id = res.json()["data"]["_id"]
+```
+</CodeGroup>
+
+---
+
+## List all cards
+
+```
+GET /api/external/v1/cards
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/cards" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/cards", {
+  headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` },
+});
+const { data } = await res.json();
+```
+</CodeGroup>
+
+---
+
+## Get a specific card
+
+```
+GET /api/external/v1/cards/{cardId}
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/cards/CARD_ID" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/cards/${cardId}`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+```
+</CodeGroup>
+
+---
+
+## Fund or withdraw from a card
+
+```
+POST /api/external/v1/cards/wallet
+```
+
+Use this endpoint to move funds between your Dancity wallet and a virtual card.
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/cards/wallet" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "cardId": "CARD_ID",
+    "amount": 10,
+    "action": "fund"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/cards/wallet", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({ cardId, amount: 10, action: "fund" }),
+});
+```
+</CodeGroup>
+
+---
+
+## Update a card (freeze / unfreeze)
+
+```
+PUT /api/external/v1/cards/{cardId}
+```
+
+<CodeGroup>
+```bash cURL
+curl -sS -X PUT "https://api.dancity.app/api/external/v1/cards/CARD_ID" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{ "status": "frozen" }'
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/cards/${cardId}`,
+  {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ status: "frozen" }),
+  }
+);
+```
+</CodeGroup>
+
+---
+
+## View card transactions
+
+```
+GET /api/external/v1/cards/transactions/{cardId}
+```
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `page` | integer | Page number (default: 1) |
+| `limit` | integer | Results per page |
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/cards/transactions/CARD_ID?page=1&limit=20" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/cards/transactions/${cardId}?page=1&limit=20`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+```
+</CodeGroup>
+
+---
+
+## Typical card lifecycle
+
+```
+1. GET  /cards/exchange-rate → check current NGN/USD rate
+
+2. POST /cards              → create a new card, save cardId
+
+3. POST /cards/wallet       → fund the card (specify amount in USD)
+
+4. Use the card for online purchases
+
+5. GET  /cards/transactions/{cardId} → review spend history
+
+6. PUT  /cards/{cardId}     → freeze when not in use
+```
+
+<Warning>
+  Card amounts are in **USD**. Use the exchange-rate endpoint to calculate the NGN equivalent before presenting costs to your users.
+</Warning>

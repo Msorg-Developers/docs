@@ -1,0 +1,197 @@
+---
+title: "Products & services catalog"
+description: "Browse services, products, and plans before making a purchase"
+---
+
+## Overview
+
+The catalog endpoints let you discover what's available on the Dancity platform before initiating any purchase. Always fetch catalog data dynamically — identifiers (plan IDs, product names) can change over time.
+
+The catalog has three levels:
+
+| Level | Endpoint | What it returns |
+|-------|----------|-----------------|
+| **Services** | `GET /api/external/v1/services` | Top-level service categories (e.g., Airtime, Data, Cable TV) |
+| **Products** | `GET /api/external/v1/products` | Specific providers within a service (e.g., MTN, DSTV) |
+| **Plans** | `GET /api/external/v1/plans/data`, `.../cable`, `.../internet` | Individual purchase options with prices |
+
+## Authentication
+
+All catalog endpoints use your **merchant API key** only.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## Get services
+
+```
+GET /api/external/v1/services
+```
+
+Returns all service categories. Use filters to narrow results.
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `name` | string | Filter by service name |
+| `disable` | boolean | `false` returns only active services |
+| `displayonmenu` | boolean | `true` returns only menu-visible services |
+| `isutility` | boolean | Filter utility services (electricity, etc.) |
+
+<CodeGroup>
+```bash cURL
+# All active services
+curl -sS "https://api.dancity.app/api/external/v1/services?disable=false" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/services?disable=false",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/services",
+    params={"disable": "false"},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+---
+
+## Get products
+
+```
+GET /api/external/v1/products
+```
+
+Returns products (providers/operators) within a service. Filter by service name to get only the products you need.
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `service` | string | Service name (e.g., `"Airtime"`) |
+| `name` | string | Product name (e.g., `"MTN Airtime"`) |
+| `productId` | string | Mongo `_id` of a specific product |
+
+<CodeGroup>
+```bash cURL
+# All airtime products
+curl -sS "https://api.dancity.app/api/external/v1/products?service=Airtime" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/products?service=Airtime",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data = [{ name: "MTN Airtime", ... }, { name: "Airtel Airtime", ... }]
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/products",
+    params={"service": "Airtime"},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+```
+</CodeGroup>
+
+---
+
+## Get data plans
+
+```
+GET /api/external/v1/plans/data
+```
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `product` | string | Filter by product name (e.g., `"MTN Data"`) |
+| `planId` | string | Specific plan Mongo `_id` |
+| `isHotDeal` | boolean | Only hot-deal plans |
+| `isbucketplan` | boolean | Only bucket plans |
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/plans/data?product=MTN%20Data" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/plans/data?product=MTN%20Data",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data = [{ _id: "...", name: "1GB – 30 days", amount: 350 }, ...]
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/plans/data",
+    params={"product": "MTN Data"},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+```
+</CodeGroup>
+
+---
+
+## Get cable plans
+
+```
+GET /api/external/v1/plans/cable
+```
+
+Returns available cable TV subscription plans (DSTV, GOtv, Startimes, etc.).
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/plans/cable" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/plans/cable",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+```
+</CodeGroup>
+
+---
+
+## Recommended catalog caching strategy
+
+Catalog data (services, products, plans) doesn't change frequently, but prices and availability can. We recommend:
+
+- Cache catalog responses for **15–60 minutes** in production
+- Re-fetch on cache miss or user-initiated refresh
+- Never hard-code plan IDs — always resolve them from the catalog at runtime
+
+<Tip>
+  Use the `product` name returned from `/products` as the `product` field in buy requests (e.g., `"MTN Airtime"`). Use the plan `_id` as the `plan` field for data/internet purchases.
+</Tip>
+
+## Next steps
+
+- [Buy airtime or data](/guides/airtime-data)
+- [Buy cable TV subscription](/guides/cable-tv)
+- [Buy internet bundle](/guides/internet)

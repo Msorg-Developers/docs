@@ -1,0 +1,173 @@
+---
+title: "Education pins"
+description: "Validate pricing and purchase exam scratch cards and result-checker PINs"
+---
+
+## Overview
+
+The education PIN endpoints let you purchase result-checker and exam registration scratch cards (WAEC, NECO, JAMB, etc.) in bulk or one at a time. The flow is:
+
+1. **Validate** the product and quantity to get the total cost
+2. **Purchase** the PIN(s)
+
+## Authentication
+
+Both endpoints use your merchant API key. The purchase endpoint also requires `channel: API`.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+channel: API   ← required on purchase only
+```
+
+---
+
+## Step 1 — Validate education product
+
+```
+POST /api/external/v1/education-pin/validate-product
+```
+
+Use this to check pricing and availability before committing to a purchase.
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✓ | Product name (e.g., `"WAEC Result Checker"`) |
+| `quantity` | number | ✓ | Number of PINs to purchase |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/education-pin/validate-product" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "WAEC Result Checker",
+    "quantity": 5
+  }'
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/education-pin/validate-product",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ product: "WAEC Result Checker", quantity: 5 }),
+  }
+);
+const { data } = await res.json();
+// data.totalCost → show to user before confirming purchase
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/education-pin/validate-product",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+    },
+    json={"product": "WAEC Result Checker", "quantity": 5},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+---
+
+## Step 2 — Purchase education PIN
+
+```
+POST /api/external/v1/education-pin/purchase
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✓ | Product name (same as validation) |
+| `quantity` | number | ✓ | Number of PINs |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `promocode` | string | | Discount promo code |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/education-pin/purchase" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{
+    "product": "WAEC Result Checker",
+    "quantity": 5,
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/education-pin/purchase",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+      "Content-Type": "application/json",
+      channel: "API",
+    },
+    body: JSON.stringify({
+      product: "WAEC Result Checker",
+      quantity: 5,
+      pin: "1234",
+    }),
+  }
+);
+const data = await res.json();
+// data.pins → array of purchased PINs
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/education-pin/purchase",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+        "channel": "API",
+    },
+    json={"product": "WAEC Result Checker", "quantity": 5, "pin": "1234"},
+)
+pins = res.json()["data"]["pins"]
+```
+</CodeGroup>
+
+---
+
+## Full purchase flow
+
+```
+1. POST /api/external/v1/education-pin/validate-product
+   { product, quantity }
+   → confirm total cost with user
+
+2. POST /api/external/v1/education-pin/purchase
+   { product, quantity, pin }
+   → receive array of PINs
+```
+
+<Tip>
+  Always validate first to present the total cost to your customer. This step is especially important for bulk orders where the total can be significant.
+</Tip>
+
+<Warning>
+  Education PINs are delivered immediately. Store them securely — they cannot be re-fetched from the API after the transaction response is received.
+</Warning>
+
+## Next steps
+
+- [Transactions: requery a purchase](/guides/transactions)

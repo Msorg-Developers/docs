@@ -1,0 +1,137 @@
+---
+title: "Betting wallet funding"
+description: "Top up a customer's betting account from your Dancity wallet"
+---
+
+## Overview
+
+The betting funding endpoint lets you deposit funds directly into a customer's account on supported betting platforms (SportyBet, BetKing, 1xBet, etc.). The customer's betting wallet ID is used as the `customerIdentifier`.
+
+## Authentication
+
+Requires your merchant API key.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## Fund a betting account
+
+```
+POST /api/external/v1/betting/funding
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `product` | string | ✓ | Betting platform name (e.g., `"SportyBet"`) |
+| `customerIdentifier` | string | ✓ | Customer's betting account/user ID |
+| `amount` | number | ✓ | Amount in NGN (minimum ₦100) |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `saveAsBeneficiary` | boolean | | Save account as beneficiary |
+| `beneficiaryName` | string | | Label for saved beneficiary |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/betting/funding" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "product": "SportyBet",
+    "customerIdentifier": "12345678",
+    "amount": 1000,
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/betting/funding", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    product: "SportyBet",
+    customerIdentifier: "12345678",
+    amount: 1000,
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/betting/funding",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+    },
+    json={
+        "product": "SportyBet",
+        "customerIdentifier": "12345678",
+        "amount": 1000,
+        "pin": "1234",
+    },
+)
+print(res.json())
+```
+</CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Betting wallet funded successfully",
+  "data": {
+    "transactionId": "TXN-2025-XXXXX",
+    "tranxId": "dcy_ref_xxxxxxxx",
+    "status": "SUCCESS",
+    "amount": 1000,
+    "product": "SportyBet",
+    "customerIdentifier": "12345678"
+  }
+}
+```
+
+<Warning>
+  The minimum funding amount is **₦100**. Always verify the `customerIdentifier` with your customer before sending — funds credited to a wrong betting account cannot be reversed automatically.
+</Warning>
+
+<Tip>
+  Use `customerRef` to pass your own transaction or order ID. This makes it easy to reconcile records with your system.
+</Tip>
+
+---
+
+## Checking available betting platforms
+
+Use the products catalog to get the list of supported betting platforms:
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/products?service=Betting" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/products?service=Betting",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+```
+</CodeGroup>
+
+## Next steps
+
+- [Transactions: requery a purchase](/guides/transactions)
+- [Catalog: browse available products](/guides/catalog)

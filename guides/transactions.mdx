@@ -1,0 +1,196 @@
+---
+title: "Transactions"
+description: "Query your transaction history and recheck the status of individual purchases"
+---
+
+## Overview
+
+The transactions endpoints let you:
+
+- **List** all transactions with filtering, pagination, and date range support
+- **Requery** a single transaction by ID to get its current status
+
+Use these endpoints to build reconciliation workflows, display purchase history to users, or confirm whether a pending transaction has settled.
+
+## Authentication
+
+Both endpoints use your merchant API key only.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## List transactions
+
+```
+GET /api/external/v1/transactions
+```
+
+### Query parameters
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `page` | integer | Page number (default: `1`) |
+| `limit` | integer | Results per page (default: `10`, max: `100`) |
+| `start_date` | date-time | ISO 8601 start of range (e.g., `2025-01-01T00:00:00.000Z`) |
+| `end_date` | date-time | ISO 8601 end of range |
+| `service` | string | Filter by service name (e.g., `"Airtime"`, `"Data"`) |
+| `status` | string | `SUCCESS`, `FAILED`, `PENDING`, `PROCESSING`, `CANCELLED` |
+| `tranxType` | string | `DEBIT` or `CREDIT` |
+| `query` | string | Free-text search across transaction fields |
+| `isBulk` | boolean | Filter bulk transactions only |
+
+<CodeGroup>
+```bash cURL
+# Last 20 successful airtime transactions
+curl -sS "https://api.dancity.app/api/external/v1/transactions?service=Airtime&status=SUCCESS&limit=20" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  service: "Airtime",
+  status: "SUCCESS",
+  limit: "20",
+  page: "1",
+});
+
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/transactions?${params}`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data.transactions → array of transaction objects
+// data.total → total count for pagination
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/transactions",
+    params={"service": "Airtime", "status": "SUCCESS", "limit": 20, "page": 1},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+print(res.json()["data"])
+```
+</CodeGroup>
+
+### Filter by date range
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/transactions?start_date=2025-04-01T00:00:00.000Z&end_date=2025-04-30T23:59:59.000Z" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const params = new URLSearchParams({
+  start_date: "2025-04-01T00:00:00.000Z",
+  end_date: "2025-04-30T23:59:59.000Z",
+  limit: "50",
+});
+
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/transactions?${params}`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+```
+</CodeGroup>
+
+---
+
+## Requery a single transaction
+
+```
+GET /api/external/v1/transactions/{transactionId}
+```
+
+Use this endpoint to get the latest status of a specific transaction. You can pass either the Mongo `_id` or the external `tranxId` as the path parameter.
+
+| Param | Description |
+|-------|-------------|
+| `transactionId` | Mongo `_id` **or** `tranxId` from the purchase response |
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/transactions/TXN-2025-XXXXX" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/transactions/${transactionId}`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+console.log(data.status); // "SUCCESS" | "FAILED" | "PENDING" | "PROCESSING" | "CANCELLED"
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    f"https://api.dancity.app/api/external/v1/transactions/{transaction_id}",
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+status = res.json()["data"]["status"]
+```
+</CodeGroup>
+
+---
+
+## Transaction status values
+
+| Status | Meaning |
+|--------|---------|
+| `SUCCESS` | Transaction completed and delivered |
+| `FAILED` | Transaction could not be completed |
+| `PENDING` | Awaiting processing |
+| `PROCESSING` | In progress with the provider |
+| `CANCELLED` | Cancelled before completion |
+
+<Info>
+  A `PROCESSING` status means the transaction is in flight with the provider. Poll the requery endpoint at a reasonable interval (e.g., every 10–30 seconds) rather than immediately retrying the purchase.
+</Info>
+
+---
+
+## Reconciliation pattern
+
+For automated reconciliation, page through transactions using a fixed date range and `limit=100`:
+
+```javascript
+async function fetchAllTransactions(startDate, endDate) {
+  const transactions = [];
+  let page = 1;
+
+  while (true) {
+    const params = new URLSearchParams({
+      start_date: startDate,
+      end_date: endDate,
+      limit: "100",
+      page: String(page),
+    });
+    const res = await fetch(
+      `https://api.dancity.app/api/external/v1/transactions?${params}`,
+      { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+    );
+    const { data } = await res.json();
+
+    transactions.push(...data.transactions);
+
+    if (transactions.length >= data.total) break;
+    page++;
+  }
+
+  return transactions;
+}
+```
+
+## Next steps
+
+- [Webhooks: receive real-time status updates](/guides/webhook)
+- [Error reference](/guides/errors)

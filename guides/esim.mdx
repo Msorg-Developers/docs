@@ -1,0 +1,242 @@
+---
+title: "eSIM"
+description: "Browse regions and packages, purchase an eSIM, and manage active eSIMs"
+---
+
+## Overview
+
+Dancity eSIMs give your users data connectivity in 150+ countries without swapping a physical SIM. The eSIM flow is:
+
+1. Browse **regions** to find the destination country or region
+2. Browse **packages** for that region to see data, validity, and price
+3. **Purchase** the eSIM — the user installs it on their device via a QR code
+4. Optionally **top up** an existing eSIM with additional data
+
+## Authentication
+
+All eSIM endpoints use your merchant API key only.
+
+```http
+Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+---
+
+## Step 1 — Browse regions
+
+```
+GET /api/external/v1/esim/regions
+```
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `type` | number | `1` = single-country, `2` = multi-country/regional |
+
+<CodeGroup>
+```bash cURL
+# Single-country eSIMs
+curl -sS "https://api.dancity.app/api/external/v1/esim/regions?type=1" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/esim/regions?type=1",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data = [{ regionCode: "NG", name: "Nigeria" }, ...]
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/esim/regions",
+    params={"type": 1},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+```
+</CodeGroup>
+
+---
+
+## Step 2 — Browse packages for a region
+
+```
+GET /api/external/v1/esim/packages
+```
+
+| Query param | Type | Required | Description |
+|-------------|------|----------|-------------|
+| `regionCode` | string | ✓ | Region code from `/esim/regions` (e.g., `"NG"`) |
+| `regionType` | string | | Region type from regions response |
+| `type` | string | | `"BASE"` (new eSIM) or `"TOPUP"` (add data) |
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/esim/packages?regionCode=NG&type=BASE" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  "https://api.dancity.app/api/external/v1/esim/packages?regionCode=NG&type=BASE",
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data = [{ packageCode: "...", data: "1GB", validity: "30 days", price: 5.00 }]
+```
+
+```python Python
+import requests, os
+
+res = requests.get(
+    "https://api.dancity.app/api/external/v1/esim/packages",
+    params={"regionCode": "NG", "type": "BASE"},
+    headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
+)
+```
+</CodeGroup>
+
+---
+
+## Step 3 — Purchase eSIM
+
+```
+POST /api/external/v1/esim/purchase
+```
+
+### Request body
+
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `packageCode` | string | ✓ | Package code from `/esim/packages` |
+| `wallettype` | string | ✓ | Wallet to debit (e.g., `"main"`) |
+| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `customerRef` | string | | Your internal reference ID |
+| `promocode` | string | | Discount promo code |
+| `saveAsBeneficiary` | boolean | | Save as beneficiary |
+| `beneficiaryName` | string | | Label for beneficiary |
+
+<CodeGroup>
+```bash cURL
+curl -sS -X POST "https://api.dancity.app/api/external/v1/esim/purchase" \
+  -H "Authorization: Bearer $DANCITY_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "packageCode": "NG-1GB-30D",
+    "wallettype": "main",
+    "pin": "1234"
+  }'
+```
+
+```javascript Node.js
+const res = await fetch("https://api.dancity.app/api/external/v1/esim/purchase", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify({
+    packageCode: "NG-1GB-30D",
+    wallettype: "main",
+    pin: "1234",
+  }),
+});
+const data = await res.json();
+// data.transactionId → use for status check
+```
+
+```python Python
+import requests, os
+
+res = requests.post(
+    "https://api.dancity.app/api/external/v1/esim/purchase",
+    headers={
+        "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
+        "Content-Type": "application/json",
+    },
+    json={"packageCode": "NG-1GB-30D", "wallettype": "main", "pin": "1234"},
+)
+print(res.json())
+```
+</CodeGroup>
+
+---
+
+## Top up an existing eSIM
+
+When a user's eSIM is running low, fetch available top-up packages using their ICCID:
+
+```
+GET /api/external/v1/esim/topup-packages?iccid={iccid}
+```
+
+Then purchase using the `POST /esim/purchase` endpoint with `type=TOPUP` package code.
+
+---
+
+## View your eSIMs
+
+```
+GET /api/external/v1/esim/my-esims
+```
+
+| Query param | Type | Description |
+|-------------|------|-------------|
+| `page` | integer | Page number |
+| `limit` | integer | Results per page |
+
+---
+
+## Get eSIM details by transaction
+
+```
+GET /api/external/v1/esim/details/{transactionId}
+```
+
+Returns the QR code data, ICCID, and activation status for a purchased eSIM. Use this to display the QR code to your customer.
+
+<CodeGroup>
+```bash cURL
+curl -sS "https://api.dancity.app/api/external/v1/esim/details/TXN_ID" \
+  -H "Authorization: Bearer $DANCITY_API_KEY"
+```
+
+```javascript Node.js
+const res = await fetch(
+  `https://api.dancity.app/api/external/v1/esim/details/${transactionId}`,
+  { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
+);
+const { data } = await res.json();
+// data.qrCode → render as QR image for the user to scan
+```
+</CodeGroup>
+
+---
+
+## Full purchase flow
+
+```
+1. GET /esim/regions?type=1
+   → user selects destination country → note regionCode
+
+2. GET /esim/packages?regionCode=NG&type=BASE
+   → user selects data package → note packageCode
+
+3. POST /esim/purchase { packageCode, wallettype, pin }
+   → note transactionId
+
+4. GET /esim/details/{transactionId}
+   → display QR code to user for device installation
+```
+
+<Tip>
+  Save the `transactionId` after purchase. Use `GET /esim/details/{transactionId}` to retrieve and re-display the QR code if the user needs it again.
+</Tip>
+
+## Next steps
+
+- [Transactions: requery a purchase](/guides/transactions)
+- [Wallet: check balance before purchase](/guides/wallet)
