@@ -1,35 +1,35 @@
 ---
 title: "Dancity Developer Docs"
-description: "Build payment and VAS integrations with the Dancity API"
+description: "Build VAS and payment integrations with the Dancity merchant API"
 ---
 
 <img
   className="block dark:hidden rounded-xl"
-  src="/images/hero-light.png"
+  src="/images/dancity-hero-light.png"
   alt="Dancity API"
 />
 <img
   className="hidden dark:block rounded-xl"
-  src="/images/hero-dark.png"
+  src="/images/dancity-hero-dark.png"
   alt="Dancity API"
 />
 
 ## Welcome
 
-The Dancity HTTP API covers merchant VAS (`/api/external/v1`), in-app VAS and wallets (`/api/...` with a JWT), catalog (services, products, plans), eSIM, virtual cards, education pins, and betting. The **API reference** tab lists **one page per operation** (like PayVessel): each page pulls **Try it** and schemas from the shared [OpenAPI](https://www.openapis.org/) spec.
+The Dancity merchant API (`/api/external/v1`) lets you buy airtime, data, cable TV subscriptions, electricity tokens, internet bundles, education PINs, and eSIMs — and fund betting accounts — all from your Dancity wallet balance. Every request is authenticated with your **merchant API key** and the `channel: API` header.
 
 <CardGroup cols={2}>
-  <Card title="OpenAPI + Try it" icon="brackets" href="/api-reference/introduction">
-    Base URL, auth matrix, and link to the **Endpoints** spec (interactive).
-  </Card>
-  <Card title="Run & test" icon="terminal" href="/guides/run-and-test">
-    curl, env vars, and local backend.
+  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
+    Make your first API call in under 5 minutes.
   </Card>
   <Card title="Authentication" icon="key" href="/guides/authentication">
-    API keys, JWT, `channel`, IP allowlist, and webhooks.
+    API key setup, `channel` header, and IP allowlisting.
   </Card>
-  <Card title="Quickstart" icon="rocket" href="/guides/quickstart">
-    First request in a few minutes.
+  <Card title="API reference" icon="brackets" href="/api-reference/introduction">
+    Interactive endpoint docs with Try it.
+  </Card>
+  <Card title="Run & test" icon="terminal" href="/guides/run-and-test">
+    curl, env vars, and local backend setup.
   </Card>
 </CardGroup>
 
@@ -37,16 +37,16 @@ The Dancity HTTP API covers merchant VAS (`/api/external/v1`), in-app VAS and wa
 
 <Steps>
   <Step title="Dancity account (Tier 3)">
-    Sign up at [dancity.app](https://dancity.app). API access requires Tier 3 and an approved API client.
+    Sign up at [dancity.app](https://dancity.app). API access requires **Tier 3** status and an approved API client.
   </Step>
-  <Step title="API key">
-    After approval, generate a merchant key from the API Key page. **Copy once** — it is not shown again.
+  <Step title="Generate your API key">
+    After approval, generate a merchant key from your [API Key page](https://dancity.app/profile/api-key). **Copy it once** — it is not shown again.
   </Step>
-  <Step title="Allowlist IPs / webhook">
-    Add server IPs and (optionally) an HTTPS `webhookUrl` for server-to-server events.
+  <Step title="Allowlist your server IPs">
+    Add the IP addresses of your backend servers to the allowlist. Requests from non-allowlisted IPs return `401`.
   </Step>
-  <Step title="Integrate">
-    Open the [API reference](/api-reference/introduction) tab and the group for your product (e.g. **VAS** or **Wallet**). Each page matches one HTTP operation and **Try it**.
+  <Step title="Set a webhook URL (optional)">
+    Add an HTTPS webhook URL to receive real-time transaction status events. See the [Webhooks guide](/guides/webhook).
   </Step>
 </Steps>
 
@@ -55,6 +55,8 @@ The Dancity HTTP API covers merchant VAS (`/api/external/v1`), in-app VAS and wa
 ```
 https://api.dancity.app
 ```
+
+All endpoints are prefixed with `/api/external/v1/`.
 
 ## Help
 
