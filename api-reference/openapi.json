@@ -144,8 +144,7 @@
         "summary": "Purchase airtime",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -157,8 +156,7 @@
                 "required": [
                   "product",
                   "phone",
-                  "amount",
-                  "pin"
+                  "amount"
                 ],
                 "properties": {
                   "product": {
@@ -167,30 +165,14 @@
                   },
                   "phone": {
                     "type": "string",
-                    "example": "08012345678"
+                    "example": "080*******"
                   },
                   "amount": {
                     "type": "number",
                     "minimum": 50,
                     "maximum": 1000
                   },
-                  "pin": {
-                    "type": "string",
-                    "example": "1234"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
                     "type": "string"
                   }
                 }
@@ -203,17 +185,55 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Airtime purchase successful",
+                  "data": {
+                    "tranxId": "TXN-20260506-001",
+                    "status": "SUCCESS",
+                    "amount": 500,
+                    "phone": "080*******",
+                    "network": "MTN"
+                  }
                 }
               }
             }
           },
           "400": {
-            "description": "Validation error"
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -226,8 +246,7 @@
         "summary": "Purchase data bundle",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -239,8 +258,7 @@
                 "required": [
                   "plan",
                   "phone",
-                  "wallettype",
-                  "pin"
+                  "wallettype"
                 ],
                 "properties": {
                   "plan": {
@@ -249,28 +267,13 @@
                   },
                   "phone": {
                     "type": "string",
-                    "example": "08012345678"
+                    "example": "080*******"
                   },
                   "wallettype": {
                     "type": "string",
                     "example": "main"
                   },
-                  "pin": {
-                    "type": "string"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
                     "type": "string"
                   }
                 }
@@ -283,14 +286,54 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Data purchase successful",
+                  "data": {
+                    "tranxId": "TXN-20260506-002",
+                    "status": "SUCCESS",
+                    "plan": "1GB Daily",
+                    "phone": "080*******"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -304,8 +347,7 @@
         "description": "Single validation endpoint for external merchants. Set `type` to `\"cable\"` or `\"electricity\"`.",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -314,11 +356,16 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["type"],
+                "required": [
+                  "type"
+                ],
                 "properties": {
                   "type": {
                     "type": "string",
-                    "enum": ["cable", "electricity"],
+                    "enum": [
+                      "cable",
+                      "electricity"
+                    ],
                     "description": "Validation type"
                   },
                   "smartcardNumber": {
@@ -333,7 +380,7 @@
                     "type": "string",
                     "description": "Required when type is electricity"
                   },
-                  "billerName": {
+                  "productName": {
                     "type": "string",
                     "description": "Required when type is electricity"
                   },
@@ -343,7 +390,10 @@
                   },
                   "meterType": {
                     "type": "string",
-                    "enum": ["prepaid", "postpaid"],
+                    "enum": [
+                      "prepaid",
+                      "postpaid"
+                    ],
                     "description": "Required when type is electricity"
                   }
                 }
@@ -375,8 +425,41 @@
               }
             }
           },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Smartcard number not found",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -389,8 +472,7 @@
         "summary": "Purchase cable subscription",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -403,8 +485,7 @@
                   "smartcardNumber",
                   "cableplan",
                   "cablename",
-                  "customerName",
-                  "pin"
+                  "customerName"
                 ],
                 "properties": {
                   "smartcardNumber": {
@@ -419,22 +500,7 @@
                   "customerName": {
                     "type": "string"
                   },
-                  "pin": {
-                    "type": "string"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
                     "type": "string"
                   }
                 }
@@ -447,14 +513,54 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Cable subscription successful",
+                  "data": {
+                    "tranxId": "TXN-20260506-003",
+                    "status": "SUCCESS",
+                    "smartcardNumber": "1234567890",
+                    "package": "DStv Compact"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -467,8 +573,7 @@
         "summary": "Purchase electricity (vend / postpaid)",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -482,18 +587,13 @@
                   "meterType",
                   "amount",
                   "customerName",
-                  "address",
-                  "pin"
+                  "address"
                 ],
                 "properties": {
                   "meterNumber": {
                     "type": "string"
                   },
-                  "billerCode": {
-                    "type": "string",
-                    "description": "Optional Mongo ObjectId for biller"
-                  },
-                  "billerName": {
+                  "productName": {
                     "type": "string"
                   },
                   "meterType": {
@@ -513,22 +613,7 @@
                   "address": {
                     "type": "string"
                   },
-                  "pin": {
-                    "type": "string"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
                     "type": "string"
                   }
                 }
@@ -541,14 +626,54 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Electricity vend successful",
+                  "data": {
+                    "tranxId": "TXN-20260506-004",
+                    "status": "SUCCESS",
+                    "token": "1234-5678-9012-3456",
+                    "units": 20.5
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -561,8 +686,7 @@
         "summary": "Purchase internet bundle",
         "security": [
           {
-            "DancityApiKey": [],
-            "ChannelHeader": []
+            "DancityApiKey": []
           }
         ],
         "requestBody": {
@@ -574,8 +698,7 @@
                 "required": [
                   "plan",
                   "accountid",
-                  "phone",
-                  "pin"
+                  "phone"
                 ],
                 "properties": {
                   "plan": {
@@ -586,26 +709,9 @@
                   },
                   "phone": {
                     "type": "string",
-                    "example": "08123456789"
-                  },
-                  "pin": {
-                    "type": "string",
-                    "minLength": 5,
-                    "maxLength": 5
+                    "example": "080*******"
                   },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
                     "type": "string"
                   }
                 }
@@ -618,14 +724,53 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Internet bundle purchase successful",
+                  "data": {
+                    "tranxId": "TXN-20260506-005",
+                    "status": "SUCCESS",
+                    "plan": "Spectranet 10GB"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -636,7 +781,7 @@
           "Transactions"
         ],
         "summary": "Get transactions",
-        "description": "Fetch the authenticated user’s transactions. Use `page`, `limit`, date range, `status`, `service`, `tranxType`, and other query params to filter. For a single row and up-to-date status, use `GET /api/transactions/{transactionId}`.",
+        "description": "Fetch the authenticated user’s transactions. Use `page`, `limit`, and date range to filter. For a single row and up-to-date status, use `GET /api/external/v1/transactions/{transactionId}`.",
         "security": [
           {
             "DancityApiKey": []
@@ -675,48 +820,6 @@
               "type": "string",
               "format": "date-time"
             }
-          },
-          {
-            "name": "service",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "status",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "tranxType",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "query",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "filter",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "isBulk",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
           }
         ],
         "responses": {
@@ -724,14 +827,47 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Transactions retrieved successfully",
+                  "data": {
+                    "transactions": [],
+                    "pagination": {
+                      "page": 1,
+                      "limit": 10,
+                      "total": 0,
+                      "totalPages": 0,
+                      "hasPrevious": false,
+                      "hasNext": false
+                    }
+                  }
                 }
               }
             }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -742,7 +878,7 @@
           "Products & services"
         ],
         "summary": "Get services",
-        "description": "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/external/v1/services/{id}` is still supported for the same by-id result.",
+        "description": "Filter services by `name`.",
         "security": [
           {
             "DancityApiKey": []
@@ -750,48 +886,57 @@
         ],
         "parameters": [
           {
-            "name": "id",
-            "in": "query",
-            "description": "Optional. Service Mongo id — when set, response is a single `service` object.",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "name",
             "in": "query",
             "schema": {
               "type": "string"
             }
-          },
-          {
-            "name": "disable",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "displayonmenu",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "isutility",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
           }
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "SUCCESS",
+                  "allServices": [
+                    {
+                      "_id": "66d1ccc630a43475d74bde4d",
+                      "name": "DATA",
+                      "disable": true,
+                      "displayonmenu": true,
+                      "isutility": true,
+                      "icon": "string"
+                    }
+                  ]
+                }
+              }
+            }
           },
           "401": {
-            "description": "Unauthorized"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -821,7 +966,60 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Transaction fetched",
+                  "data": {
+                    "tranxId": "TXN-20260506-001",
+                    "type": "DEBIT",
+                    "amount": 500,
+                    "status": "SUCCESS",
+                    "service": "Airtime",
+                    "phone": "080*******",
+                    "createdAt": "2026-05-06T10:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Transaction not found",
+                  "statusCode": 404
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -837,16 +1035,6 @@
             "DancityApiKey": []
           }
         ],
-        "parameters": [
-          {
-            "name": "channel",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -855,8 +1043,7 @@
                 "required": [
                   "product",
                   "customerIdentifier",
-                  "amount",
-                  "pin"
+                  "amount"
                 ],
                 "properties": {
                   "product": {
@@ -869,16 +1056,7 @@
                     "type": "number",
                     "minimum": 100
                   },
-                  "pin": {
-                    "type": "string"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
                     "type": "string"
                   }
                 }
@@ -888,10 +1066,57 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Betting account funded",
+                  "data": {
+                    "tranxId": "TXN-20260506-006",
+                    "status": "SUCCESS",
+                    "customerIdentifier": "user@betsite.com",
+                    "amount": 1000
+                  }
+                }
+              }
+            }
           },
           "400": {
-            "description": "Bad request"
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -907,16 +1132,6 @@
             "DancityApiKey": []
           }
         ],
-        "parameters": [
-          {
-            "name": "channel",
-            "in": "header",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -924,8 +1139,7 @@
                 "type": "object",
                 "required": [
                   "quantity",
-                  "product",
-                  "pin"
+                  "product"
                 ],
                 "properties": {
                   "quantity": {
@@ -936,15 +1150,6 @@
                   },
                   "customerRef": {
                     "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "pin": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
-                    "type": "string"
                   }
                 }
               }
@@ -953,7 +1158,61 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Education pins purchased",
+                  "data": {
+                    "tranxId": "TXN-20260506-007",
+                    "pins": [
+                      {
+                        "pin": "****-****-****",
+                        "serial": "SN-001",
+                        "expiry": "2027-01-01"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -992,7 +1251,57 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Product validated",
+                  "data": {
+                    "product": "WAEC Result Checker",
+                    "pricePerUnit": 4500,
+                    "quantity": 2,
+                    "total": 9000
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1020,7 +1329,57 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "eSIM regions fetched successfully",
+                  "data": {
+                    "regions": [
+                      {
+                        "code": "ES",
+                        "name": "Spain",
+                        "type": "country",
+                        "flagUrl": null,
+                        "iso": null
+                      },
+                      {
+                        "code": "EU-42",
+                        "name": "Europe (40+ areas)",
+                        "type": "multi-country",
+                        "flagUrl": null,
+                        "iso": null
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1067,7 +1426,48 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Packages fetched",
+                  "data": [
+                    {
+                      "packageCode": "NG-1GB-7D",
+                      "name": "Nigeria 1GB 7 Days",
+                      "dataAmount": "1GB",
+                      "validity": "7 days",
+                      "price": 3000
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1095,7 +1495,47 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Top-up packages fetched",
+                  "data": [
+                    {
+                      "packageCode": "NG-1GB-7D",
+                      "name": "Nigeria 1GB Top-Up",
+                      "dataAmount": "1GB",
+                      "price": 3000
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1111,16 +1551,6 @@
             "DancityApiKey": []
           }
         ],
-        "parameters": [
-          {
-            "name": "channel",
-            "in": "header",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -1128,8 +1558,7 @@
                 "type": "object",
                 "required": [
                   "packageCode",
-                  "wallettype",
-                  "pin"
+                  "wallettype"
                 ],
                 "properties": {
                   "packageCode": {
@@ -1139,22 +1568,7 @@
                     "type": "string",
                     "example": "main"
                   },
-                  "pin": {
-                    "type": "string"
-                  },
                   "customerRef": {
-                    "type": "string"
-                  },
-                  "promocode": {
-                    "type": "string"
-                  },
-                  "deviceKey": {
-                    "type": "string"
-                  },
-                  "saveAsBeneficiary": {
-                    "type": "boolean"
-                  },
-                  "beneficiaryName": {
                     "type": "string"
                   }
                 }
@@ -1164,7 +1578,57 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "eSIM purchased",
+                  "data": {
+                    "tranxId": "TXN-20260506-008",
+                    "status": "SUCCESS",
+                    "iccid": "8960000000000000001",
+                    "activationCode": "LPA:1$smdp.example.com$ACTIVATION-CODE"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1198,7 +1662,47 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "eSIMs fetched",
+                  "data": [
+                    {
+                      "iccid": "8960000000000000001",
+                      "status": "ACTIVE",
+                      "packageCode": "NG-1GB-7D",
+                      "expiresAt": "2026-05-13T00:00:00Z"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1226,7 +1730,45 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "eSIM details fetched",
+                  "data": {
+                    "iccid": "8960000000000000001",
+                    "status": "ACTIVE",
+                    "dataRemaining": "500MB",
+                    "expiresAt": "2026-05-13T00:00:00Z"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1244,7 +1786,48 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Cards fetched",
+                  "data": [
+                    {
+                      "cardId": "card_abc123",
+                      "last4": "4242",
+                      "currency": "USD",
+                      "balance": 50,
+                      "status": "ACTIVE"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       },
@@ -1270,7 +1853,58 @@
         },
         "responses": {
           "201": {
-            "description": "Created"
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Card created",
+                  "data": {
+                    "cardId": "card_abc123",
+                    "last4": "4242",
+                    "currency": "USD",
+                    "balance": 0,
+                    "status": "ACTIVE"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1288,7 +1922,44 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Exchange rate fetched",
+                  "data": {
+                    "currency": "USD",
+                    "rate": 1620,
+                    "baseCurrency": "NGN"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1330,7 +2001,51 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Transactions fetched",
+                  "data": {
+                    "total": 5,
+                    "transactions": [
+                      {
+                        "id": "txn_001",
+                        "amount": 10,
+                        "currency": "USD",
+                        "description": "Netflix",
+                        "createdAt": "2026-05-01T00:00:00Z"
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1358,7 +2073,56 @@
         },
         "responses": {
           "201": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Card funded successfully",
+                  "data": {
+                    "cardId": "card_abc123",
+                    "balance": 60,
+                    "currency": "USD"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1386,7 +2150,46 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Card fetched",
+                  "data": {
+                    "cardId": "card_abc123",
+                    "last4": "4242",
+                    "currency": "USD",
+                    "balance": 50,
+                    "status": "ACTIVE"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       },
@@ -1422,7 +2225,55 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Card updated",
+                  "data": {
+                    "cardId": "card_abc123",
+                    "status": "FROZEN"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Validation failed",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1444,14 +2295,49 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Wallets retrieved successfully",
+                  "data": [
+                    {
+                      "_id": "59ea65qqqqqxxxxx45zzzz7111",
+                      "user": "69ea65628bzszs42zsfdd67a2",
+                      "name": "Main Wallet",
+                      "balance": 0,
+                      "bonus": 0,
+                      "currency": "NGN",
+                      "createdAt": "2026-04-23T18:30:58.751Z",
+                      "updatedAt": "2026-04-23T18:30:58.751Z",
+                      "version": 0
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1494,6 +2380,18 @@
           },
           "404": {
             "description": "Not found"
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1504,20 +2402,13 @@
           "Products & services"
         ],
         "summary": "Get products",
-        "description": "Filter products with `productId`, `name`, or `service` (service name).",
+        "description": "Filter products by `name` or `service` (service name).",
         "security": [
           {
             "DancityApiKey": []
           }
         ],
         "parameters": [
-          {
-            "name": "productId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "name",
             "in": "query",
@@ -1538,14 +2429,52 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "statusCode": 200,
+                  "message": "SUCCESS",
+                  "allProduct": [
+                    {
+                      "_id": "68d846303d56536a80047ad1",
+                      "name": "1XBET",
+                      "note": "Fund 1XBET wallet",
+                      "disable": false,
+                      "service": {
+                        "_id": "68d8462d3d56536a80047a69",
+                        "name": "Betting"
+                      },
+                      "pricingmethod": "PERCENTAGE",
+                      "price": 1.5,
+                      "min": 100,
+                      "max": 100000
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1556,7 +2485,7 @@
           "Products & services"
         ],
         "summary": "Get data plans",
-        "description": "Filter by `product`, `planId`, `isHotDeal`, `isbucketplan`.",
+        "description": "Filter by `product`.",
         "security": [
           {
             "DancityApiKey": []
@@ -1564,31 +2493,10 @@
         ],
         "parameters": [
           {
-            "name": "planId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "product",
             "in": "query",
             "schema": {
               "type": "string"
-            }
-          },
-          {
-            "name": "isHotDeal",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
-            }
-          },
-          {
-            "name": "isbucketplan",
-            "in": "query",
-            "schema": {
-              "type": "boolean"
             }
           }
         ],
@@ -1597,14 +2505,56 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "message": "SUCCESS",
+                  "data": [
+                    {
+                      "_id": "69e3b468c24a58c03a7ed3ab",
+                      "product": {
+                        "name": "MTN GIFTING",
+                        "disable": false,
+                        "service": {
+                          "name": "DATA",
+                          "disable": true
+                        },
+                        "sortOrder": 3
+                      },
+                      "plansize": 40,
+                      "plansizegb": 0.04,
+                      "planvolume": "MB",
+                      "sellingprice": 50,
+                      "validity": "1 Day",
+                      "isbucketplan": false,
+                      "isHotDeal": true
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1615,20 +2565,13 @@
           "Products & services"
         ],
         "summary": "Get cable plans",
-        "description": "Filter with `cableplanId` and `product`.",
+        "description": "Filter with `product`.",
         "security": [
           {
             "DancityApiKey": []
           }
         ],
         "parameters": [
-          {
-            "name": "cableplanId",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
           {
             "name": "product",
             "in": "query",
@@ -1642,14 +2585,49 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "message": "SUCCESS",
+                  "data": [
+                    {
+                      "_id": "66eebbe090fec69424007967",
+                      "package": "GOtv Supa Plus - monthly N16,800",
+                      "product": {
+                        "name": "GOTV"
+                      },
+                      "sellingprice": 16800,
+                      "costprice": 16800,
+                      "commission": 0,
+                      "disable": false,
+                      "vendingmedium": "vtpass"
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
@@ -1697,14 +2675,44 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SuccessEnvelope"
+                "example": {
+                  "success": true,
+                  "message": "Internet plans fetched",
+                  "data": [
+                    {
+                      "_id": "iplan_001",
+                      "name": "Spectranet 10GB",
+                      "product": "Spectranet",
+                      "amount": 5000
+                    }
+                  ]
                 }
               }
             }
           },
           "401": {
-            "description": "Invalid API key or IP not allowlisted"
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
           }
         }
       }
