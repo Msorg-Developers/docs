@@ -189,7 +189,7 @@
                   "success": true,
                   "message": "Airtime purchase successful",
                   "data": {
-                    "tranxId": "TXN-20260506-001",
+                    "transactionId": "TXN-20260506-001",
                     "status": "SUCCESS",
                     "amount": 500,
                     "phone": "080*******",
@@ -290,7 +290,7 @@
                   "success": true,
                   "message": "Data purchase successful",
                   "data": {
-                    "tranxId": "TXN-20260506-002",
+                    "transactionId": "TXN-20260506-002",
                     "status": "SUCCESS",
                     "plan": "1GB Daily",
                     "phone": "080*******"
@@ -517,7 +517,7 @@
                   "success": true,
                   "message": "Cable subscription successful",
                   "data": {
-                    "tranxId": "TXN-20260506-003",
+                    "transactionId": "TXN-20260506-003",
                     "status": "SUCCESS",
                     "smartcardNumber": "1234567890",
                     "package": "DStv Compact"
@@ -628,12 +628,11 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "Electricity vend successful",
+                  "message": "Electricity purchase processed",
                   "data": {
-                    "tranxId": "TXN-20260506-004",
+                    "transactionId": "TXN-20260506-004",
                     "status": "SUCCESS",
-                    "token": "1234-5678-9012-3456",
-                    "units": 20.5
+                    "token": "1234-5678-9012-3456"
                   }
                 }
               }
@@ -728,7 +727,7 @@
                   "success": true,
                   "message": "Internet bundle purchase successful",
                   "data": {
-                    "tranxId": "TXN-20260506-005",
+                    "transactionId": "TXN-20260506-005",
                     "status": "SUCCESS",
                     "plan": "Spectranet 10GB"
                   }
@@ -947,7 +946,7 @@
           "Transactions"
         ],
         "summary": "Requery transaction",
-        "description": "Return one transaction and its current `status` by Mongo `_id` or by `tranxId`. Use to requery after a purchase or for polling. Typical `status` values include `SUCCESS`, `FAILED`, `PROCESSING`, `PENDING`, `CANCELLED`.",
+        "description": "Return one transaction and its current `status` by Mongo `_id` or by `transactionId`. Use to requery after a purchase or for polling. Typical `status` values include `SUCCESS`, `FAILED`, `PROCESSING`, `PENDING`, `CANCELLED`.",
         "security": [
           {
             "DancityApiKey": []
@@ -958,7 +957,7 @@
             "name": "transactionId",
             "in": "path",
             "required": true,
-            "description": "Mongo id or external `tranxId` (same path segment).",
+            "description": "Mongo id or external `transactionId` (same path segment).",
             "schema": {
               "type": "string"
             }
@@ -973,7 +972,7 @@
                   "success": true,
                   "message": "Transaction fetched",
                   "data": {
-                    "tranxId": "TXN-20260506-001",
+                    "transactionId": "TXN-20260506-001",
                     "type": "DEBIT",
                     "amount": 500,
                     "status": "SUCCESS",
@@ -1073,7 +1072,7 @@
                   "success": true,
                   "message": "Betting account funded",
                   "data": {
-                    "tranxId": "TXN-20260506-006",
+                    "transactionId": "TXN-20260506-006",
                     "status": "SUCCESS",
                     "customerIdentifier": "user@betsite.com",
                     "amount": 1000
@@ -1165,7 +1164,7 @@
                   "success": true,
                   "message": "Education pins purchased",
                   "data": {
-                    "tranxId": "TXN-20260506-007",
+                    "transactionId": "TXN-20260506-007",
                     "pins": [
                       {
                         "pin": "****-****-****",
@@ -1585,7 +1584,7 @@
                   "success": true,
                   "message": "eSIM purchased",
                   "data": {
-                    "tranxId": "TXN-20260506-008",
+                    "transactionId": "TXN-20260506-008",
                     "status": "SUCCESS",
                     "iccid": "8960000000000000001",
                     "activationCode": "LPA:1$smdp.example.com$ACTIVATION-CODE"
