@@ -23,7 +23,7 @@ Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## Get wallets balance
 
 ```
-GET /api/external/v1/wallet
+GET /api/v1/wallet
 ```
 
 Returns all wallets linked to the API key's account, including their types and current balances.
@@ -32,12 +32,12 @@ Returns all wallets linked to the API key's account, including their types and c
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/wallet" \
+curl -sS "https://api.dancity.app/api/v1/wallet" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/wallet", {
+const res = await fetch("https://api.dancity.app/api/v1/wallet", {
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
   },
@@ -50,7 +50,7 @@ console.log(data); // array of wallet objects
 import requests, os
 
 res = requests.get(
-    "https://api.dancity.app/api/external/v1/wallet",
+    "https://api.dancity.app/api/v1/wallet",
     headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
 )
 print(res.json()["data"])
@@ -80,14 +80,12 @@ print(res.json()["data"])
 
 ## Using wallet types in purchases
 
-Most buy endpoints accept a `wallettype` field. Use the `wallettype` values returned here — typically `"main"` — unless you specifically want to spend a bonus balance.
+Most buy endpoints accept an optional `wallettype` field. Omit it to debit your **main** wallet, or pass a value from `GET /api/v1/wallet` (e.g. `"main"`, `"bonus"`).
 
 ```json
 {
   "plan": "PLAN_ID",
-  "phone": "08012345678",
-  "wallettype": "main",
-  "pin": "1234"
+  "phone": "08012345678"
 }
 ```
 

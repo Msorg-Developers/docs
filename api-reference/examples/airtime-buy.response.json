@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "message": "Airtime purchase processed",
+  "data": {
+    "_id": "6a1c3ba6f269d84e04f098cc",
+    "tranxId": "DNTY174825YP565I",
+    "service": "AIRTIME",
+    "product": "MTN Airtime",
+    "tranxType": "DEBIT",
+    "status": "FAILED",
+    "currency": "NGN",
+    "remarks": "Airtime purchase for 09037346247",
+    "amount": 100,
+    "fee": 0,
+    "amountPaid": 98.5,
+    "balanceBefore": 5276,
+    "balanceAfter": 5177.5,
+    "number": "09037346247",
+    "customerRef": "",
+    "channel": "API",
+    "paymentMedium": "MAIN WALLET",
+    "tranxDate": "2026-05-31T13:46:14.825Z",
+    "apiResponse": "Airtime purchase failed",
+    "isReversal": false,
+    "quantity": 0,
+    "createdAt": "2026-05-31T13:46:14.827Z"
+  }
+}

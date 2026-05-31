@@ -26,38 +26,34 @@ channel: API
 ## Step 1 — Validate meter
 
 ```
-POST /api/external/v1/validate
+POST /api/v1/electricity/validate
 ```
-
-Send `type: "electricity"` to validate a meter number.
 
 ### Request body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | ✓ | Must be `"electricity"` |
 | `meterNumber` | string | ✓ | Customer's meter number |
-| `billerName` | string | ✓ | DISCO name (e.g., `"IKEDC"`, `"EKEDC"`) |
+| `billerCode` | string | ✓ | From [Get products](/api-reference/catalog/get-api-products) (e.g. `"EKEDC"`) or display name (e.g. `"Eko Electricity"`) |
 | `amount` | number | ✓ | Intended vend amount in NGN (for pricing context) |
 | `meterType` | string | ✓ | `"prepaid"` or `"postpaid"` |
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/validate" \
+curl -sS -X POST "https://api.dancity.app/api/v1/electricity/validate" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
-    "type": "electricity",
     "meterNumber": "45012345678",
-    "billerName": "IKEDC",
+    "billerCode": "EKEDC",
     "amount": 2000,
     "meterType": "prepaid"
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
+const res = await fetch("https://api.dancity.app/api/v1/electricity/validate", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -65,9 +61,8 @@ const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
     channel: "API",
   },
   body: JSON.stringify({
-    type: "electricity",
     meterNumber: "45012345678",
-    billerName: "IKEDC",
+    billerCode: "EKEDC",
     amount: 2000,
     meterType: "prepaid",
   }),
@@ -80,16 +75,15 @@ console.log(data.customerName); // display to user
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/validate",
+    "https://api.dancity.app/api/v1/electricity/validate",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
         "channel": "API",
     },
     json={
-        "type": "electricity",
         "meterNumber": "45012345678",
-        "billerName": "IKEDC",
+        "billerCode": "EKEDC",
         "amount": 2000,
         "meterType": "prepaid",
     },
@@ -116,10 +110,10 @@ customer_name = res.json()["data"]["customerName"]
 
 ---
 
-## Step 2 — Buy electricity
+## Step 2 — Buy electricity token
 
 ```
-POST /api/external/v1/electricity/buy
+POST /api/v1/electricity/buy
 ```
 
 ### Request body
@@ -127,36 +121,34 @@ POST /api/external/v1/electricity/buy
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `meterNumber` | string | ✓ | Same number used in validation |
+| `billerCode` | string | ✓ | From [Get products](/api-reference/catalog/get-api-products) (e.g. `"EKEDC"`) |
 | `meterType` | string | ✓ | `"prepaid"` or `"postpaid"` |
 | `amount` | number | ✓ | Vend amount in NGN (minimum ₦500) |
 | `customerName` | string | ✓ | Name returned from validation |
 | `address` | string | ✓ | Customer's address |
-| `pin` | string | ✓ | Your Dancity transaction PIN |
-| `billerName` | string | | DISCO name |
-| `billerCode` | string | | Mongo ObjectId of the biller (optional) |
 | `customerRef` | string | | Your internal reference ID |
 | `saveAsBeneficiary` | boolean | | Save meter as beneficiary |
 | `promocode` | string | | Discount promo code |
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/electricity/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/electricity/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
     "meterNumber": "45012345678",
+    "billerCode": "EKEDC",
     "meterType": "prepaid",
     "amount": 2000,
     "customerName": "Jane Doe",
     "address": "12 Lekki Phase 1, Lagos",
-    "billerName": "IKEDC",
-    "pin": "1234"
+    "customerRef": "ELEC-REF-001"
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/electricity/buy", {
+const res = await fetch("https://api.dancity.app/api/v1/electricity/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -165,12 +157,12 @@ const res = await fetch("https://api.dancity.app/api/external/v1/electricity/buy
   },
   body: JSON.stringify({
     meterNumber: "45012345678",
+    billerCode: "EKEDC",
     meterType: "prepaid",
     amount: 2000,
     customerName: "Jane Doe",
     address: "12 Lekki Phase 1, Lagos",
-    billerName: "IKEDC",
-    pin: "1234",
+    customerRef: "ELEC-REF-001",
   }),
 });
 const data = await res.json();
@@ -180,7 +172,7 @@ const data = await res.json();
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/electricity/buy",
+    "https://api.dancity.app/api/v1/electricity/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -188,12 +180,12 @@ res = requests.post(
     },
     json={
         "meterNumber": "45012345678",
+        "billerCode": "EKEDC",
         "meterType": "prepaid",
         "amount": 2000,
         "customerName": "Jane Doe",
         "address": "12 Lekki Phase 1, Lagos",
-        "billerName": "IKEDC",
-        "pin": "1234",
+        "customerRef": "ELEC-REF-001",
     },
 )
 print(res.json())
@@ -224,15 +216,15 @@ print(res.json())
 ## Full purchase flow
 
 ```
-1. Collect meterNumber, meterType, billerName from user
+1. Collect meterNumber, meterType, billerCode from user
 
-2. POST /api/external/v1/validate  { type: "electricity", ... }
+2. POST /api/v1/electricity/validate  { meterNumber, billerCode, amount, meterType }
    → confirm customerName
 
 3. Show customerName to user → user confirms
 
-4. POST /api/external/v1/electricity/buy
-   → send meterNumber, meterType, amount, customerName, address, pin
+4. POST /api/v1/electricity/buy
+   → send meterNumber, billerCode, meterType, amount, customerName, address
 ```
 
 <Warning>

@@ -1,0 +1,68 @@
+{
+  "message": "SUCCESS",
+  "data": [
+    {
+      "_id": "66eebbe090fec69424007967",
+      "product": "GOTV",
+      "plan": "GOtv Supa Plus - monthly N16,800",
+      "price": 16800,
+      "planId": "GOtv_Supa_Plus_monthly_N16_800"
+    },
+    {
+      "_id": "66eebc0a90fec6942400796e",
+      "product": "GOTV",
+      "plan": "GOtv Supa - monthly N11,400",
+      "price": 11400,
+      "planId": "GOtv_Supa_monthly_N11_400"
+    },
+    {
+      "_id": "66eebd3a90fec694240079d0",
+      "product": "GOTV",
+      "plan": "GOtv Jolli N5,800",
+      "price": 5800,
+      "planId": "GOtv_Jolli_N5_800"
+    },
+    {
+      "_id": "66eebd4490fec694240079d7",
+      "product": "GOTV",
+      "plan": "GOtv Jinja N3,900",
+      "price": 3900,
+      "planId": "GOtv_Jinja_N3_900"
+    },
+    {
+      "_id": "66eebd5290fec694240079de",
+      "product": "GOTV",
+      "plan": "GOtv Smallie - monthly N1900",
+      "price": 1900,
+      "planId": "GOtv_Smallie_monthly_N1900"
+    },
+    {
+      "_id": "66eebd6290fec694240079e5",
+      "product": "GOTV",
+      "plan": "GOtv Smallie - quarterly N5,100",
+      "price": 5100,
+      "planId": "GOtv_Smallie_quarterly_N5_100"
+    },
+    {
+      "_id": "66eebd6f90fec694240079ec",
+      "product": "GOTV",
+      "plan": "GOtv Smallie - yearly N15,000",
+      "price": 15000,
+      "planId": "GOtv_Smallie_yearly_N15_000"
+    },
+    {
+      "_id": "6798708ea30810e1d179bdd2",
+      "product": "GOTV",
+      "plan": "GOtv Max N8,500",
+      "price": 8500,
+      "planId": "GOtv_Max_N8_500"
+    },
+    {
+      "_id": "69e09ddf2023e9b41b448e8e",
+      "product": "GOTV",
+      "plan": "GOtv Max",
+      "price": 8500,
+      "planId": "GOtv_Max"
+    }
+  ]
+}

@@ -4,6 +4,7 @@
   "description": "Mintlify docs — `npm run dev` uses node@22 + mint@latest; `dev:docker` avoids host Node entirely.",
   "scripts": {
     "dev": "node scripts/run-mint-dev.cjs",
-    "dev:docker": "docker run --rm -it -p 3000:3000 -v \"$(pwd):/project\" -w /project node:22-bookworm npx --yes mint@latest dev"
+    "dev:docker": "docker run --rm -it -p 3000:3000 -v \"$(pwd):/project\" -w /project node:22-bookworm npx --yes mint@latest dev",
+    "dev:stop": "node scripts/stop-mint-dev.cjs"
   }
 }

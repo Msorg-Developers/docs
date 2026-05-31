@@ -5,18 +5,24 @@ const p = path.join(__dirname, "../api-reference/openapi.json");
 const o = JSON.parse(fs.readFileSync(p, "utf8"));
 
 o.info.description =
-  "Paths below match `https://api.dancity.app` + global prefix `api`. Merchant: `Authorization: Bearer dcy_live_...` and `channel: API`. App: JWT. See Guides for flows.";
+  "Paths below match the server base URL + global prefix `api`. Merchant: `Authorization: Bearer dcy_live_...` and `channel: API`. App: JWT. See Guides for flows.";
+
+o.servers = [
+  { url: "https://api.dancity.app", description: "Production" },
+  { url: "http://localhost:6565", description: "Local development" },
+];
 
 o.tags = [
-  { "name": "VAS", "description": "Merchant API (`/api/external/v1`): catalog GETs (wallet, services, products, plans) and purchase routes; `channel: API` on POST buys; app education & betting where listed" },
-  { "name": "Products & services", "description": "One GET for services, one for products, and one per plan type, each with query filters" },
+  { "name": "VAS", "description": "Merchant API (`/api/v1`): catalog GETs (wallet, services, products, plans) and purchase routes; `channel: API` on POST buys; app education & betting where listed" },
+  { "name": "Products & services", "description": "Catalog GETs: all services; products and plans with optional query filters" },
   { "name": "Wallet", "description": "Get wallet by id (JWT)" },
   { "name": "Transactions", "description": "Fetch your transactions and requery one by id for current status" },
   { "name": "Betting", "description": "Betting funding" },
   { "name": "Education", "description": "Education pins" },
   { "name": "eSIM", "description": "eSIM catalog and purchase" },
-  { "name": "Virtual card", "description": "Cards" },
-  { "name": "Models", "description": "Enums and payload shapes" },
+  // { "name": "Virtual card", "description": "Cards" },
+  // { "name": "Models", "description": "Enums and payload shapes" },
+  { "name": "Webhook", "description": "Outbound events Dancity POSTs to your configured HTTPS URL" },
 ];
 
 o.components.schemas = {
@@ -49,26 +55,6 @@ const ok = {
 };
 
 const extraPaths = {
-  "/api/external/v1/services": {
-    get: {
-      tags: ["Products & services"],
-      summary: "Get services",
-      description:
-        "One endpoint for services: use query parameters to filter, or pass `id` to return a single service. `GET /api/external/v1/services/{id}` is still supported for the same by-id result.",
-      security: jwt,
-      parameters: [
-        { name: "id", in: "query", description: "Optional. Service Mongo id — when set, response is a single `service` object.", schema: { type: "string" } },
-        { name: "name", in: "query", schema: { type: "string" } },
-        { name: "disable", in: "query", schema: { type: "boolean" } },
-        { name: "displayonmenu", in: "query", schema: { type: "boolean" } },
-        { name: "isutility", in: "query", schema: { type: "boolean" } },
-      ],
-      responses: {
-        200: { description: "OK" },
-        401: { description: "Unauthorized" },
-      },
-    },
-  },
   "/api/products": {
     get: {
       tags: ["Products & services"],
@@ -218,31 +204,12 @@ const extraPaths = {
       responses: { 200: { description: "OK" } },
     },
   },
-  "/api/education-pin/validate-product": {
-    post: {
-      tags: ["Education"],
-      summary: "Validate education product / pricing",
-      security: jwt,
-      requestBody: {
-        content: {
-          "application/json": {
-            schema: {
-              type: "object",
-              required: ["product", "quantity"],
-              properties: { product: { type: "string" }, quantity: { type: "number" } },
-            },
-          },
-        },
-      },
-      responses: { 200: { description: "OK" } },
-    },
-  },
   "/api/esim/regions": {
     get: {
       tags: ["eSIM"],
       summary: "eSIM regions",
       security: jwt,
-      parameters: [{ name: "type", in: "query", schema: { type: "number", description: "1=country, 2=multi" } }],
+      parameters: [{ name: "type", in: "query", description: "Filter regions: 1 = single-country, 2 = multi-country/regional. Omit for all.", schema: { type: "number", enum: [1, 2], example: 1 } }],
       responses: { 200: { description: "OK" } },
     },
   },
@@ -252,9 +219,9 @@ const extraPaths = {
       summary: "eSIM packages for region",
       security: jwt,
       parameters: [
-        { name: "regionCode", in: "query", required: true, schema: { type: "string", example: "NG" } },
-        { name: "regionType", in: "query", schema: { type: "string" } },
-        { name: "type", in: "query", schema: { type: "string", enum: ["BASE", "TOPUP"] } },
+        { name: "regionCode", in: "query", required: true, description: "Region code from GET /api/v1/esim/regions (e.g. NG).", schema: { type: "string", example: "NG" } },
+        { name: "regionType", in: "query", description: "Region `type` from regions list: country (default) or multi-country.", schema: { type: "string", enum: ["country", "multi-country", "global"], example: "country" } },
+        { name: "type", in: "query", description: "BASE = new eSIM, TOPUP = add data to existing eSIM.", schema: { type: "string", enum: ["BASE", "TOPUP"], example: "BASE" } },
       ],
       responses: { 200: { description: "OK" } },
     },
@@ -262,9 +229,10 @@ const extraPaths = {
   "/api/esim/topup-packages": {
     get: {
       tags: ["eSIM"],
-      summary: "Top-up packages for ICCID",
+      summary: "Get top-up packages for ICCID",
+      description: "Add-on data packages for an existing eSIM. Pass ICCID from purchase or my-esims.",
       security: jwt,
-      parameters: [{ name: "iccid", in: "query", required: true, schema: { type: "string" } }],
+      parameters: [{ name: "iccid", in: "query", required: true, description: "ICCID of the active eSIM.", schema: { type: "string", example: "8960000000000000001" } }],
       responses: { 200: { description: "OK" } },
     },
   },
@@ -279,16 +247,11 @@ const extraPaths = {
           "application/json": {
             schema: {
               type: "object",
-              required: ["packageCode", "wallettype", "pin"],
+              required: ["packageCode"],
               properties: {
-                packageCode: { type: "string" },
-                wallettype: { type: "string", example: "main" },
-                pin: { type: "string" },
-                customerRef: { type: "string" },
-                promocode: { type: "string" },
-                deviceKey: { type: "string" },
-                saveAsBeneficiary: { type: "boolean" },
-                beneficiaryName: { type: "string" },
+                packageCode: { type: "string", example: "NG-1GB-30D" },
+                customerRef: { type: "string", example: "ESIM-REF-001" },
+                iccid: { type: "string", description: "Required for TOPUP packages", example: "8960000000000000001" },
               },
             },
           },
@@ -300,11 +263,12 @@ const extraPaths = {
   "/api/esim/my-esims": {
     get: {
       tags: ["eSIM"],
-      summary: "List user eSIMs",
+      summary: "Fetch eSIMs",
+      description: "List active eSIMs on the merchant account (paginated).",
       security: jwt,
       parameters: [
-        { name: "page", in: "query", schema: { type: "integer" } },
-        { name: "limit", in: "query", schema: { type: "integer" } },
+        { name: "page", in: "query", description: "Page number (starts at 1).", schema: { type: "integer", default: 1, example: 1 } },
+        { name: "limit", in: "query", description: "Number of eSIMs per page.", schema: { type: "integer", default: 20, example: 20 } },
       ],
       responses: { 200: { description: "OK" } },
     },
@@ -312,14 +276,22 @@ const extraPaths = {
   "/api/esim/details/{transactionId}": {
     get: {
       tags: ["eSIM"],
-      summary: "eSIM details for transaction",
+      summary: "Get eSIM details",
+      description: "QR code, ICCID, and activation status for an eSIM purchase.",
       security: jwt,
       parameters: [
-        { name: "transactionId", in: "path", required: true, schema: { type: "string" } },
+        {
+          name: "transactionId",
+          in: "path",
+          required: true,
+          description: "Mongo _id, tranxId, or customerRef from the purchase.",
+          schema: { type: "string", example: "DNTY8374056F678V" },
+        },
       ],
       responses: { 200: { description: "OK" } },
     },
   },
+  /*
   "/api/cards": {
     get: {
       tags: ["Virtual card"],
@@ -388,7 +360,8 @@ const extraPaths = {
       responses: { 200: { description: "OK" } },
     },
   },
-  "/api/external/v1/wallet": {
+  */
+  "/api/v1/wallet": {
     get: {
       tags: ["VAS"],
       summary: "Wallets and balances (merchant, API key)",
@@ -398,7 +371,7 @@ const extraPaths = {
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/wallet/{id}": {
+  "/api/v1/wallet/{id}": {
     get: {
       tags: ["VAS"],
       summary: "Single wallet (merchant, API key)",
@@ -412,23 +385,17 @@ const extraPaths = {
       },
     },
   },
-  "/api/external/v1/services": {
+  "/api/v1/services": {
     get: {
       tags: ["VAS"],
-      summary: "List/filter services (merchant, API key)",
-      description: "Same filters as app `GET /api/external/v1/services` (`id`, `name`, `disable`, ...).",
+      summary: "List services (merchant, API key)",
+      description: "Returns all service categories.",
       security: extKey,
-      parameters: [
-        { name: "id", in: "query", schema: { type: "string" } },
-        { name: "name", in: "query", schema: { type: "string" } },
-        { name: "disable", in: "query", schema: { type: "boolean" } },
-        { name: "displayonmenu", in: "query", schema: { type: "boolean" } },
-        { name: "isutility", in: "query", schema: { type: "boolean" } },
-      ],
+      parameters: [],
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/services/{id}": {
+  "/api/v1/services/{id}": {
     get: {
       tags: ["VAS"],
       summary: "Service by id (merchant, API key)",
@@ -437,49 +404,63 @@ const extraPaths = {
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/products": {
+  "/api/v1/products": {
     get: {
       tags: ["VAS"],
       summary: "Products available to buy (merchant, API key)",
-      description: "Filter with `productId`, `name`, or `service` (service name) like `GET /api/products`.",
+      description: "Filter with `service` (service name).",
       security: extKey,
       parameters: [
-        { name: "productId", in: "query", schema: { type: "string" } },
-        { name: "name", in: "query", schema: { type: "string" } },
-        { name: "service", in: "query", schema: { type: "string" } },
+        {
+          name: "service",
+          in: "query",
+          description: "Service name from GET /api/v1/services (e.g. Airtime, Data).",
+          example: "DATA",
+          schema: { type: "string", example: "DATA" },
+        },
       ],
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/plans/data": {
+  "/api/v1/plans/data": {
     get: {
       tags: ["VAS"],
       summary: "Data plans (merchant, API key)",
-      description: "Filter by `product`, `planId`, `isHotDeal`, `isbucketplan` — same as app `GET /api/plans/data`.",
+      description: "Filter by product name from GET /api/v1/products.",
       security: extKey,
       parameters: [
-        { name: "planId", in: "query", schema: { type: "string" } },
-        { name: "product", in: "query", schema: { type: "string" } },
-        { name: "isHotDeal", in: "query", schema: { type: "boolean" } },
-        { name: "isbucketplan", in: "query", schema: { type: "boolean" } },
+        {
+          name: "product",
+          in: "query",
+          description:
+            "Product name from GET /api/v1/products (e.g. MTN GIFTING, GLO GIFTING). Accepts spaces, underscores, or hyphens: MTN GIFTING, MTN_GIFTING, MTN-GIFTING.",
+          example: "MTN GIFTING",
+          schema: { type: "string", example: "MTN GIFTING" },
+        },
       ],
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/plans/cable": {
+  "/api/v1/plans/cable": {
     get: {
       tags: ["VAS"],
       summary: "Cable plans (merchant, API key)",
-      description: "Filter with `cableplanId` and `product` like `GET /api/plans/cable`.",
+      description: "Filter by product name from GET /api/v1/products.",
       security: extKey,
       parameters: [
-        { name: "cableplanId", in: "query", schema: { type: "string" } },
-        { name: "product", in: "query", schema: { type: "string" } },
+        {
+          name: "product",
+          in: "query",
+          description:
+            "Product name from GET /api/v1/products (e.g. DSTV, GOTV, Startimes).",
+          example: "GOTV",
+          schema: { type: "string", example: "GOTV" },
+        },
       ],
       responses: { 200: ok, 401: { description: "Invalid API key or IP not allowlisted" } },
     },
   },
-  "/api/external/v1/plans/internet": {
+  "/api/v1/plans/internet": {
     get: {
       tags: ["VAS"],
       summary: "Internet plans (merchant, API key)",
@@ -503,9 +484,10 @@ for (const k of Object.keys(o.paths)) {
 o.webhooks = {
   partnerTransaction: {
     post: {
-      tags: ["Models"],
-      summary: "Inbound webhook (Dancity → your HTTPS URL)",
-      description: "Server-to-server POST. Verify signature as in Guides → Webhook.",
+      tags: ["Webhook"],
+      summary: "Outbound webhook to your server",
+      description:
+        "Dancity POSTs this payload to your configured HTTPS webhook URL when transaction events occur. You do not call this on the Dancity API — implement an endpoint on your server to receive it. Verify X-Dancity-Signature as in Guides → Webhook.",
       requestBody: {
         content: {
           "application/json": {

@@ -23,18 +23,18 @@ channel: API
 Before purchasing, fetch available plans from the catalog.
 
 ```
-GET /api/external/v1/plans/internet
+GET /api/v1/plans/internet
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/plans/internet" \
+curl -sS "https://api.dancity.app/api/v1/plans/internet" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.dancity.app/api/external/v1/plans/internet",
+  "https://api.dancity.app/api/v1/plans/internet",
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();
@@ -45,7 +45,7 @@ const { data } = await res.json();
 import requests, os
 
 res = requests.get(
-    "https://api.dancity.app/api/external/v1/plans/internet",
+    "https://api.dancity.app/api/v1/plans/internet",
     headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
 )
 print(res.json()["data"])
@@ -57,7 +57,7 @@ print(res.json()["data"])
 ## Buy internet bundle
 
 ```
-POST /api/external/v1/internet/buy
+POST /api/v1/internet/buy
 ```
 
 ### Request body
@@ -79,7 +79,7 @@ POST /api/external/v1/internet/buy
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/internet/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/internet/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
@@ -92,7 +92,7 @@ curl -sS -X POST "https://api.dancity.app/api/external/v1/internet/buy" \
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/internet/buy", {
+const res = await fetch("https://api.dancity.app/api/v1/internet/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -113,7 +113,7 @@ const data = await res.json();
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/internet/buy",
+    "https://api.dancity.app/api/v1/internet/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -135,15 +135,15 @@ print(res.json())
 ## Full purchase flow
 
 ```
-1. GET /api/external/v1/plans/internet
+1. GET /api/v1/plans/internet
    → pick a plan, note its _id
 
 2. Collect accountid and phone from your user
 
-3. GET /api/external/v1/wallet
+3. GET /api/v1/wallet
    → confirm sufficient balance
 
-4. POST /api/external/v1/internet/buy
+4. POST /api/v1/internet/buy
    → send plan._id, accountid, phone, pin
 ```
 

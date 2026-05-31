@@ -23,13 +23,15 @@ export DANCITY_API_KEY="dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 Wallet reads use a **JWT**, not your merchant key. To prove your key + IP allowlist work, call a merchant endpoint with safe placeholders (expect `400` until you substitute real catalogue values):
 
 ```bash
-curl -sS "https://api.dancity.app/api/external/v1/cable/validate?smartcardNumber=000&cableplan=000&cablename=demo" \
+curl -sS -X POST "https://api.dancity.app/api/v1/cable/validate" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
-  -H "channel: API"
+  -H "Content-Type: application/json" \
+  -H "channel: API" \
+  -d '{"smartcardNumber":"000","cablename":"DSTV"}'
 ```
 
 - `401` → key, `channel`, or IP allowlist issue.
-- `400` / vendor message → auth is fine; swap in real `smartcardNumber`, `cableplan`, and `cablename` from support or your catalogue.
+- `400` / vendor message → auth is fine; swap in real `smartcardNumber` and `cablename` from your catalogue.
 
 Check balances anytime in the **Dancity app** (wallet screen).
 
@@ -37,7 +39,7 @@ Check balances anytime in the **Dancity app** (wallet screen).
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/airtime/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/airtime/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
@@ -50,7 +52,7 @@ curl -sS -X POST "https://api.dancity.app/api/external/v1/airtime/buy" \
 ```
 
 ```javascript Node.js
-const response = await fetch("https://api.dancity.app/api/external/v1/airtime/buy", {
+const response = await fetch("https://api.dancity.app/api/v1/airtime/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -72,7 +74,7 @@ console.log(data);
 import requests, os
 
 resp = requests.post(
-    "https://api.dancity.app/api/external/v1/airtime/buy",
+    "https://api.dancity.app/api/v1/airtime/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -95,11 +97,17 @@ print(resp.json())
 {
   "success": true,
   "message": "Airtime purchase processed",
-  "data": {}
+  "data": {
+    "tranxId": "DNTY174825YP565I",
+    "status": "FAILED",
+    "amount": 100,
+    "amountPaid": 98.5,
+    "number": "09037346247"
+  }
 }
 ```
 
-`data` mirrors the internal transaction record (`tranxId`, balances, `status`, etc.).
+See [Airtime & data](/guides/airtime-data) for the full response fields.
 
 ## Step 4 — Receive webhooks (optional)
 
@@ -112,9 +120,6 @@ See the [Webhook guide](/guides/webhook) for verification instructions.
 <CardGroup cols={2}>
   <Card title="Authentication" icon="lock" href="/guides/authentication">
     Learn how API key auth and IP allowlists work
-  </Card>
-  <Card title="Run & test" icon="terminal" href="/guides/run-and-test">
-    Copy-paste curl recipes and env vars
   </Card>
   <Card title="Error codes" icon="triangle-exclamation" href="/guides/errors">
     Understand every error response

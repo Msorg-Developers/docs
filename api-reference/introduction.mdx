@@ -8,25 +8,27 @@ Use this tab for **methods, paths, parameters, and bodies**. Concept guides (aut
 
 <CardGroup cols={2}>
   <Card title="Wallet" icon="wallet" href="/api-reference/wallet/get-api-wallet-id">
-    `GET` your wallet by id — JWT.
+    Check wallet balances.
   </Card>
   <Card title="Products & services" icon="book" href="/api-reference/catalog/get-api-service">
-    Catalog: services, products, and plans (filter with query params) — JWT.
+    Browse services, products, and plans.
   </Card>
-  <Card title="VAS" icon="key" href="/api-reference/external-v1/post-api-external-v1-data-buy">
-    Merchant API: `dcy_live_…`, `channel: API` — data, airtime, cable, electricity, internet, education, betting.
+  <Card title="VAS" icon="key" href="/api-reference/v1/post-api-v1-data-buy">
+    Buy airtime, data, cable, electricity, and more.
   </Card>
+  {/* Virtual card docs hidden
   <Card title="Virtual card" icon="credit-card" href="/api-reference/virtual-card/get-api-cards">
-    Cards, funding, card transactions — JWT.
+    Create and manage virtual cards.
   </Card>
+  */}
   <Card title="eSIM" icon="sim-card" href="/api-reference/esim/get-api-esim-regions">
-    Regions, packages, purchase, details — JWT.
+    Browse and purchase eSIM packages.
   </Card>
   <Card title="Transactions" icon="receipt" href="/api-reference/transactions/get-api-transactions">
-    Fetch your history or **requery** one by id for the latest `status`.
+    List transactions or check status by id.
   </Card>
-  <Card title="Webhook" icon="webhook" href="/api-reference/webhooks/partner-inbound">
-    Inbound events to your HTTPS URL — [verify in Guides](/guides/webhook).
+  <Card title="Webhook" icon="webhook" href="/api-reference/webhooks/merchant-webhook">
+    Receive transaction events Dancity sends to your server.
   </Card>
 </CardGroup>
 

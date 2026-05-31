@@ -26,34 +26,30 @@ channel: API
 ## Step 1 — Validate smartcard
 
 ```
-POST /api/external/v1/validate
+POST /api/v1/cable/validate
 ```
-
-Send `type: "cable"` to validate a cable smartcard.
 
 ### Request body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `type` | string | ✓ | Must be `"cable"` |
 | `smartcardNumber` | string | ✓ | Customer's smartcard/decoder number |
-| `cablename` | string | ✓ | Provider name (e.g., `"DSTV"`, `"GOtv"`) |
+| `cablename` | string | ✓ | Provider name (e.g., `"DSTV"`, `"GOTV"`) |
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/validate" \
+curl -sS -X POST "https://api.dancity.app/api/v1/cable/validate" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
-    "type": "cable",
     "smartcardNumber": "1234567890",
     "cablename": "DSTV"
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
+const res = await fetch("https://api.dancity.app/api/v1/cable/validate", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -61,7 +57,6 @@ const res = await fetch("https://api.dancity.app/api/external/v1/validate", {
     channel: "API",
   },
   body: JSON.stringify({
-    type: "cable",
     smartcardNumber: "1234567890",
     cablename: "DSTV",
   }),
@@ -74,13 +69,13 @@ console.log(data.customerName); // show to user for confirmation
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/validate",
+    "https://api.dancity.app/api/v1/cable/validate",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
         "channel": "API",
     },
-    json={"type": "cable", "smartcardNumber": "1234567890", "cablename": "DSTV"},
+    json={"smartcardNumber": "1234567890", "cablename": "DSTV"},
 )
 customer_name = res.json()["data"]["customerName"]
 ```
@@ -104,10 +99,10 @@ customer_name = res.json()["data"]["customerName"]
 
 ---
 
-## Step 2 — Buy cable subscription
+## Step 2 — Cable subscription
 
 ```
-POST /api/external/v1/cable/buy
+POST /api/v1/cable/buy
 ```
 
 ### Request body
@@ -115,10 +110,8 @@ POST /api/external/v1/cable/buy
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
 | `smartcardNumber` | string | ✓ | Same number used in validation |
-| `cableplan` | string | ✓ | Plan name from `GET /plans/cable` |
-| `cablename` | string | ✓ | Provider name (e.g., `"DSTV"`) |
+| `cableplan` | string | ✓ | `planId` from `GET /api/v1/plans/cable` |
 | `customerName` | string | ✓ | Name returned from validation step |
-| `pin` | string | ✓ | Your Dancity transaction PIN |
 | `customerRef` | string | | Your internal reference ID |
 | `saveAsBeneficiary` | boolean | | Save smartcard as beneficiary |
 | `beneficiaryName` | string | | Label for saved beneficiary |
@@ -126,21 +119,20 @@ POST /api/external/v1/cable/buy
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/cable/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/cable/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
     "smartcardNumber": "1234567890",
-    "cableplan": "DStv Compact",
-    "cablename": "DSTV",
+    "cableplan": "GOtv_Supa_Plus_monthly_N16_800",
     "customerName": "John Doe",
-    "pin": "1234"
+    "customerRef": "CABLE-REF-001"
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/cable/buy", {
+const res = await fetch("https://api.dancity.app/api/v1/cable/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -149,10 +141,9 @@ const res = await fetch("https://api.dancity.app/api/external/v1/cable/buy", {
   },
   body: JSON.stringify({
     smartcardNumber: "1234567890",
-    cableplan: "DStv Compact",
-    cablename: "DSTV",
-    customerName: "John Doe", // from validation response
-    pin: "1234",
+    cableplan: "GOtv_Supa_Plus_monthly_N16_800",
+    customerName: "John Doe",
+    customerRef: "CABLE-REF-001",
   }),
 });
 const data = await res.json();
@@ -162,7 +153,7 @@ const data = await res.json();
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/cable/buy",
+    "https://api.dancity.app/api/v1/cable/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -170,10 +161,9 @@ res = requests.post(
     },
     json={
         "smartcardNumber": "1234567890",
-        "cableplan": "DStv Compact",
-        "cablename": "DSTV",
+        "cableplan": "GOtv_Supa_Plus_monthly_N16_800",
         "customerName": "John Doe",
-        "pin": "1234",
+        "customerRef": "CABLE-REF-001",
     },
 )
 print(res.json())
@@ -185,16 +175,16 @@ print(res.json())
 ## Full purchase flow
 
 ```
-1. GET /api/external/v1/plans/cable
+1. GET /api/v1/plans/cable
    → list available plans and their names
 
-2. POST /api/external/v1/validate  { type: "cable", smartcardNumber, cablename }
+2. POST /api/v1/cable/validate  { smartcardNumber, cablename }
    → confirm customer identity
 
 3. Show customerName to user → user confirms
 
-4. POST /api/external/v1/cable/buy
-   → send smartcardNumber, cableplan, cablename, customerName, pin
+4. POST /api/v1/cable/buy
+   → send smartcardNumber, cableplan, customerName
 ```
 
 <Warning>

@@ -1,0 +1,40 @@
+---
+title: "Outbound webhook to your server"
+description: "Transaction events Dancity POSTs to your configured HTTPS webhook URL"
+---
+
+Dancity **sends** webhooks **to your website** — this is not an endpoint you call on the Dancity API. When a transaction event occurs, Dancity makes an HTTP `POST` to the **Webhook URL** you configure on your [API key page](https://dancity.app/profile/api-key).
+
+Your server must expose a public **HTTPS** route (for example `https://yourstore.com/webhooks/dancity`) and return `2xx` to acknowledge delivery.
+
+## What you receive
+
+```json
+{
+  "event": "transaction.success",
+  "timestamp": "2024-04-21T10:30:00.000Z",
+  "data": {
+    "transactionId": "TXN-2024-XXXXX",
+    "type": "AIRTIME",
+    "status": "success",
+    "amount": 500,
+    "currency": "NGN",
+    "phone": "08012345678",
+    "reference": "dcy_ref_xxxxxxxx",
+    "createdAt": "2024-04-21T10:29:58.000Z"
+  }
+}
+```
+
+Each request includes an `X-Dancity-Signature` header. Verify it with your webhook secret before processing the body.
+
+## Full guide
+
+See [Webhooks](/guides/webhook) for:
+
+- Configuring your webhook URL
+- Signature verification (Node, Python, PHP)
+- Event types and retry policy
+- Idempotency and best practices
+
+The OpenAPI `webhooks.partnerTransaction` entry in `openapi.json` describes the same payload schema.

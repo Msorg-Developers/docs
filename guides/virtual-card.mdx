@@ -11,13 +11,13 @@ Key operations:
 
 | Action | Endpoint |
 |--------|----------|
-| List cards | `GET /api/external/v1/cards` |
-| Create card | `POST /api/external/v1/cards` |
-| Get FX rate | `GET /api/external/v1/cards/exchange-rate` |
-| Fund / withdraw | `POST /api/external/v1/cards/wallet` |
-| Card transactions | `GET /api/external/v1/cards/transactions/{cardId}` |
-| Card details | `GET /api/external/v1/cards/{cardId}` |
-| Freeze / update | `PUT /api/external/v1/cards/{cardId}` |
+| List cards | `GET /api/v1/cards` |
+| Create card | `POST /api/v1/cards` |
+| Get FX rate | `GET /api/v1/cards/exchange-rate` |
+| Fund / withdraw | `POST /api/v1/cards/wallet` |
+| Card transactions | `GET /api/v1/cards/transactions/{cardId}` |
+| Card details | `GET /api/v1/cards/{cardId}` |
+| Freeze / update | `PUT /api/v1/cards/{cardId}` |
 
 ## Authentication
 
@@ -34,18 +34,18 @@ Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 Before creating or funding a card, fetch the current NGN/USD rate.
 
 ```
-GET /api/external/v1/cards/exchange-rate
+GET /api/v1/cards/exchange-rate
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/cards/exchange-rate" \
+curl -sS "https://api.dancity.app/api/v1/cards/exchange-rate" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  "https://api.dancity.app/api/external/v1/cards/exchange-rate",
+  "https://api.dancity.app/api/v1/cards/exchange-rate",
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();
@@ -56,7 +56,7 @@ const { data } = await res.json();
 import requests, os
 
 res = requests.get(
-    "https://api.dancity.app/api/external/v1/cards/exchange-rate",
+    "https://api.dancity.app/api/v1/cards/exchange-rate",
     headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
 )
 print(res.json()["data"])
@@ -68,19 +68,19 @@ print(res.json()["data"])
 ## Create a virtual card
 
 ```
-POST /api/external/v1/cards
+POST /api/v1/cards
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/cards" \
+curl -sS -X POST "https://api.dancity.app/api/v1/cards" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{}'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/cards", {
+const res = await fetch("https://api.dancity.app/api/v1/cards", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -96,7 +96,7 @@ const cardId = data._id; // save for future operations
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/cards",
+    "https://api.dancity.app/api/v1/cards",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -112,17 +112,17 @@ card_id = res.json()["data"]["_id"]
 ## List all cards
 
 ```
-GET /api/external/v1/cards
+GET /api/v1/cards
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/cards" \
+curl -sS "https://api.dancity.app/api/v1/cards" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/cards", {
+const res = await fetch("https://api.dancity.app/api/v1/cards", {
   headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` },
 });
 const { data } = await res.json();
@@ -134,18 +134,18 @@ const { data } = await res.json();
 ## Get a specific card
 
 ```
-GET /api/external/v1/cards/{cardId}
+GET /api/v1/cards/{cardId}
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/cards/CARD_ID" \
+curl -sS "https://api.dancity.app/api/v1/cards/CARD_ID" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/cards/${cardId}`,
+  `https://api.dancity.app/api/v1/cards/${cardId}`,
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();
@@ -157,14 +157,14 @@ const { data } = await res.json();
 ## Fund or withdraw from a card
 
 ```
-POST /api/external/v1/cards/wallet
+POST /api/v1/cards/wallet
 ```
 
 Use this endpoint to move funds between your Dancity wallet and a virtual card.
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/cards/wallet" \
+curl -sS -X POST "https://api.dancity.app/api/v1/cards/wallet" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{
@@ -175,7 +175,7 @@ curl -sS -X POST "https://api.dancity.app/api/external/v1/cards/wallet" \
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/cards/wallet", {
+const res = await fetch("https://api.dancity.app/api/v1/cards/wallet", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -191,12 +191,12 @@ const res = await fetch("https://api.dancity.app/api/external/v1/cards/wallet", 
 ## Update a card (freeze / unfreeze)
 
 ```
-PUT /api/external/v1/cards/{cardId}
+PUT /api/v1/cards/{cardId}
 ```
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X PUT "https://api.dancity.app/api/external/v1/cards/CARD_ID" \
+curl -sS -X PUT "https://api.dancity.app/api/v1/cards/CARD_ID" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -d '{ "status": "frozen" }'
@@ -204,7 +204,7 @@ curl -sS -X PUT "https://api.dancity.app/api/external/v1/cards/CARD_ID" \
 
 ```javascript Node.js
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/cards/${cardId}`,
+  `https://api.dancity.app/api/v1/cards/${cardId}`,
   {
     method: "PUT",
     headers: {
@@ -222,7 +222,7 @@ const res = await fetch(
 ## View card transactions
 
 ```
-GET /api/external/v1/cards/transactions/{cardId}
+GET /api/v1/cards/transactions/{cardId}
 ```
 
 | Query param | Type | Description |
@@ -232,13 +232,13 @@ GET /api/external/v1/cards/transactions/{cardId}
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/cards/transactions/CARD_ID?page=1&limit=20" \
+curl -sS "https://api.dancity.app/api/v1/cards/transactions/CARD_ID?page=1&limit=20" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/cards/transactions/${cardId}?page=1&limit=20`,
+  `https://api.dancity.app/api/v1/cards/transactions/${cardId}?page=1&limit=20`,
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();

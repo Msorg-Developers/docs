@@ -1,11 +1,11 @@
 ---
 title: "Webhooks"
-description: "Receive real-time transaction event notifications from Dancity"
+description: "Receive real-time transaction events Dancity sends to your webhook URL"
 ---
 
 ## Overview
 
-Dancity sends an HTTP `POST` request to your configured webhook URL whenever a transaction event occurs. This allows you to keep your system in sync without polling the transactions endpoint.
+Dancity **sends** an HTTP `POST` to **your** configured webhook URL whenever a transaction event occurs. You implement the receiving endpoint on your server; Dancity does not expose this as an API you call. This lets you keep your system in sync without polling the transactions endpoint.
 
 ## Setting up your webhook URL
 

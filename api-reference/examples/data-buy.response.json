@@ -1,0 +1,28 @@
+{
+  "success": true,
+  "message": "Data purchase processed",
+  "data": {
+    "_id": "6a1c3cf26da239b6da0e26dc",
+    "tranxId": "DNTY506236YALLPF",
+    "service": "DATA",
+    "product": "MTN GIFTING",
+    "tranxType": "DEBIT",
+    "status": "FAILED",
+    "currency": "NGN",
+    "remarks": "MTN GIFTING 40MB for 1 Day",
+    "amount": 50,
+    "fee": 0,
+    "amountPaid": 50,
+    "balanceBefore": 5276,
+    "balanceAfter": 5226,
+    "number": "09015665451",
+    "customerRef": "DATA-REF-001",
+    "channel": "API",
+    "paymentMedium": "MAIN WALLET",
+    "tranxDate": "2026-05-31T13:51:46.236Z",
+    "apiResponse": "Sorry, you are not allowed to migrate to Betamix Bundle Mini Plan. Thank you! — Oh dear! It seems xxxxxxxxxxx is not eligible for this bundle. Please select a new bundle and try again",
+    "isReversal": false,
+    "quantity": 0,
+    "createdAt": "2026-05-31T13:51:46.238Z"
+  }
+}

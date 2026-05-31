@@ -1,0 +1,413 @@
+{
+  "message": "SUCCESS",
+  "data": [
+    {
+      "_id": "69e3b468c24a58c03a7ed3ab",
+      "product": "MTN GIFTING",
+      "plan": "40MB",
+      "price": 50,
+      "validity": "1 Day",
+      "planId": "40MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b49dc24a58c03a7ed3f6",
+      "product": "MTN GIFTING",
+      "plan": "75MB",
+      "price": 75,
+      "validity": "1 Day",
+      "planId": "75MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b4d5c24a58c03a7ed441",
+      "product": "MTN GIFTING",
+      "plan": "100MB",
+      "price": 100,
+      "validity": "1 Day",
+      "planId": "100MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b511c24a58c03a7ed4c8",
+      "product": "MTN GIFTING",
+      "plan": "110MB",
+      "price": 100,
+      "validity": "1 Day",
+      "planId": "110MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b5b1c24a58c03a7ed560",
+      "product": "MTN GIFTING",
+      "plan": "230MB",
+      "price": 200,
+      "validity": "1 Day",
+      "planId": "230MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b5ebc24a58c03a7ed586",
+      "product": "MTN GIFTING",
+      "plan": "500MB",
+      "price": 350,
+      "validity": "1 Day",
+      "planId": "500MB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b6b8c24a58c03a7ed627",
+      "product": "MTN GIFTING",
+      "plan": "750MB",
+      "price": 450,
+      "validity": "2 Days",
+      "planId": "750MB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b625c24a58c03a7ed5ac",
+      "product": "MTN GIFTING",
+      "plan": "1GB",
+      "price": 500,
+      "validity": "1 Day",
+      "planId": "1GB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3c005c24a58c03a7eda84",
+      "product": "MTN GIFTING",
+      "plan": "500MB",
+      "price": 500,
+      "validity": "7 Days",
+      "planId": "500MB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "69e3b6e7c24a58c03a7ed64c",
+      "product": "MTN GIFTING",
+      "plan": "1.5GB",
+      "price": 600,
+      "validity": "2 Days",
+      "planId": "1.5GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b726c24a58c03a7ed672",
+      "product": "MTN GIFTING",
+      "plan": "2GB",
+      "price": 750,
+      "validity": "2 Days",
+      "planId": "2GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b653c24a58c03a7ed5db",
+      "product": "MTN GIFTING",
+      "plan": "2.5GB",
+      "price": 750,
+      "validity": "1 Day",
+      "planId": "2.5GB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3c0a7c24a58c03a7edaac",
+      "product": "MTN GIFTING",
+      "plan": "1GB",
+      "price": 800,
+      "validity": "7 Days",
+      "planId": "1GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "69e3b75ac24a58c03a7ed698",
+      "product": "MTN GIFTING",
+      "plan": "2.5GB",
+      "price": 900,
+      "validity": "2 Days",
+      "planId": "2.5GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3c0efc24a58c03a7edadb",
+      "product": "MTN GIFTING",
+      "plan": "1.5GB",
+      "price": 1000,
+      "validity": "7 Days",
+      "planId": "1.5GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "69e3b783c24a58c03a7ed6c7",
+      "product": "MTN GIFTING",
+      "plan": "3.2GB",
+      "price": 1000,
+      "validity": "2 Days",
+      "planId": "3.2GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b683c24a58c03a7ed601",
+      "product": "MTN GIFTING",
+      "plan": "3.5GB",
+      "price": 1000,
+      "validity": "1 Day",
+      "planId": "3.5GB_MTN_GIFTING_1Day"
+    },
+    {
+      "_id": "69e3b7f1c24a58c03a7ed6ee",
+      "product": "MTN GIFTING",
+      "plan": "4GB",
+      "price": 1200,
+      "validity": "2 Days",
+      "planId": "4GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b89ac24a58c03a7ed769",
+      "product": "MTN GIFTING",
+      "plan": "2GB",
+      "price": 1500,
+      "validity": "30 Days",
+      "planId": "2GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3c13ac24a58c03a7edb01",
+      "product": "MTN GIFTING",
+      "plan": "3.5GB",
+      "price": 1500,
+      "validity": "7 Days",
+      "planId": "3.5GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "69e3b825c24a58c03a7ed714",
+      "product": "MTN GIFTING",
+      "plan": "5.5GB",
+      "price": 1500,
+      "validity": "2 Days",
+      "planId": "5.5GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b84dc24a58c03a7ed739",
+      "product": "MTN GIFTING",
+      "plan": "7GB",
+      "price": 1800,
+      "validity": "2 Days",
+      "planId": "7GB_MTN_GIFTING_2Days"
+    },
+    {
+      "_id": "69e3b8cfc24a58c03a7ed78f",
+      "product": "MTN GIFTING",
+      "plan": "2.7GB",
+      "price": 2000,
+      "validity": "30 Days",
+      "planId": "2.7GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3b8fcc24a58c03a7ed7b4",
+      "product": "MTN GIFTING",
+      "plan": "3.5GB",
+      "price": 2500,
+      "validity": "30 Days",
+      "planId": "3.5GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3c169c24a58c03a7edb27",
+      "product": "MTN GIFTING",
+      "plan": "6GB",
+      "price": 2500,
+      "validity": "7 Days",
+      "planId": "6GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "69e3b931c24a58c03a7ed7da",
+      "product": "MTN GIFTING",
+      "plan": "6.7GB",
+      "price": 3000,
+      "validity": "30 Days",
+      "planId": "6.7GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3b962c24a58c03a7ed800",
+      "product": "MTN GIFTING",
+      "plan": "7GB",
+      "price": 3500,
+      "validity": "30 Days",
+      "planId": "7GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3c19fc24a58c03a7edb4d",
+      "product": "MTN GIFTING",
+      "plan": "11GB",
+      "price": 3500,
+      "validity": "7 Days",
+      "planId": "11GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "6a1ac68a0fd5bfc28866da93",
+      "product": "MTN GIFTING",
+      "plan": "15GB",
+      "price": 4000,
+      "validity": "7 days",
+      "planId": "15GB_MTN_GIFTING_7days"
+    },
+    {
+      "_id": "69e3b984c24a58c03a7ed826",
+      "product": "MTN GIFTING",
+      "plan": "10GB",
+      "price": 4500,
+      "validity": "30 Days",
+      "planId": "10GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "6a1ac4690fd5bfc28866d37a",
+      "product": "MTN GIFTING",
+      "plan": "12.5GB",
+      "price": 4500,
+      "validity": "14 days",
+      "planId": "12.5GB_MTN_GIFTING_14days"
+    },
+    {
+      "_id": "69e3b9cac24a58c03a7ed855",
+      "product": "MTN GIFTING",
+      "plan": "14.5GB",
+      "price": 5000,
+      "validity": "30 Days",
+      "planId": "14.5GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3c1c6c24a58c03a7edb73",
+      "product": "MTN GIFTING",
+      "plan": "20GB",
+      "price": 5000,
+      "validity": "7 Days",
+      "planId": "20GB_MTN_GIFTING_7Days"
+    },
+    {
+      "_id": "6a1ac6c70fd5bfc28866db30",
+      "product": "MTN GIFTING",
+      "plan": "20GB",
+      "price": 5000,
+      "validity": "7 days",
+      "planId": "20GB_MTN_GIFTING_7days"
+    },
+    {
+      "_id": "69e3ba35c24a58c03a7ed87c",
+      "product": "MTN GIFTING",
+      "plan": "12.5GB",
+      "price": 5500,
+      "validity": "30 Days",
+      "planId": "12.5GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "6a1ac4bd0fd5bfc28866d49d",
+      "product": "MTN GIFTING",
+      "plan": "18GB",
+      "price": 6000,
+      "validity": "14 days",
+      "planId": "18GB_MTN_GIFTING_14days"
+    },
+    {
+      "_id": "69e3ba6fc24a58c03a7ed8a1",
+      "product": "MTN GIFTING",
+      "plan": "16.5GB",
+      "price": 6500,
+      "validity": "30 Days",
+      "planId": "16.5GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3baa0c24a58c03a7ed8c7",
+      "product": "MTN GIFTING",
+      "plan": "25GB",
+      "price": 7000,
+      "validity": "30 Days(Postpaid)",
+      "planId": "25GB_MTN_GIFTING_30Days(Postpaid)"
+    },
+    {
+      "_id": "69e3bae5c24a58c03a7ed8ed",
+      "product": "MTN GIFTING",
+      "plan": "20GB",
+      "price": 7500,
+      "validity": "30 Days",
+      "planId": "20GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "6a1ac5260fd5bfc28866d5fc",
+      "product": "MTN GIFTING",
+      "plan": "28GB",
+      "price": 8000,
+      "validity": "14 days",
+      "planId": "28GB_MTN_GIFTING_14days"
+    },
+    {
+      "_id": "69e3bc0ec24a58c03a7ed971",
+      "product": "MTN GIFTING",
+      "plan": "25GB",
+      "price": 9000,
+      "validity": "30 Days",
+      "planId": "25GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "6a1ac57c0fd5bfc28866d699",
+      "product": "MTN GIFTING",
+      "plan": "40GB",
+      "price": 10000,
+      "validity": "14 days",
+      "planId": "40GB_MTN_GIFTING_14days"
+    },
+    {
+      "_id": "69e3bd62c24a58c03a7ed9ae",
+      "product": "MTN GIFTING",
+      "plan": "36GB",
+      "price": 11000,
+      "validity": "30 Days",
+      "planId": "36GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3bdecc24a58c03a7ed9d5",
+      "product": "MTN GIFTING",
+      "plan": "65GB",
+      "price": 16000,
+      "validity": "30 days",
+      "planId": "65GB_MTN_GIFTING_30days"
+    },
+    {
+      "_id": "69e3be79c24a58c03a7eda06",
+      "product": "MTN GIFTING",
+      "plan": "75GB",
+      "price": 18000,
+      "validity": "30 Days",
+      "planId": "75GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3b386c24a58c03a7ed2c9",
+      "product": "MTN GIFTING",
+      "plan": "90GB",
+      "price": 25000,
+      "validity": "60 Days",
+      "planId": "90GB_MTN_GIFTING_60Days"
+    },
+    {
+      "_id": "69e3beb1c24a58c03a7eda2c",
+      "product": "MTN GIFTING",
+      "plan": "165GB",
+      "price": 35000,
+      "validity": "30 Days",
+      "planId": "165GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3b3ccc24a58c03a7ed30b",
+      "product": "MTN GIFTING",
+      "plan": "150GB",
+      "price": 40000,
+      "validity": "60 Days",
+      "planId": "150GB_MTN_GIFTING_60Days"
+    },
+    {
+      "_id": "69e3bf71c24a58c03a7eda54",
+      "product": "MTN GIFTING",
+      "plan": "250GB",
+      "price": 55000,
+      "validity": "30 Days",
+      "planId": "250GB_MTN_GIFTING_30Days"
+    },
+    {
+      "_id": "69e3b415c24a58c03a7ed35f",
+      "product": "MTN GIFTING",
+      "plan": "480GB",
+      "price": 90000,
+      "validity": "90 Days",
+      "planId": "480GB_MTN_GIFTING_90Days"
+    },
+    {
+      "_id": "69e3c211c24a58c03a7edba2",
+      "product": "MTN GIFTING",
+      "plan": "800GB",
+      "price": 125000,
+      "validity": "365 Days",
+      "planId": "800GB_MTN_GIFTING_365Days"
+    }
+  ]
+}

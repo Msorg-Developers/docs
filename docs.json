@@ -7,22 +7,24 @@
     "light": "#4A7AFF",
     "dark": "#00144C"
   },
-  "favicon": "/favicon.png",
-  "openapi": "api-reference/openapi.json",
-  "logo": {
-    "light": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
-    "dark": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
-    "href": "https://dancity.app"
-  },
+  "favicon": "/logo/light.svg",
   "api": {
+    "openapi": "api-reference/openapi.json",
+    "url": "full",
     "playground": {
-      "display": "interactive"
+      "display": "interactive",
+      "proxy": false
     },
     "examples": {
       "languages": ["bash", "javascript", "python"],
       "prefill": true,
       "defaults": "all"
     }
+  },
+  "logo": {
+    "light": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
+    "dark": "https://res.cloudinary.com/dglkxgoei/image/upload/v1774273336/Frame_42_ylgngi.png",
+    "href": "https://dancity.app"
   },
   "navbar": {
     "links": [
@@ -56,13 +58,12 @@
         "groups": [
           {
             "group": "Overview",
-            "pages": ["index", "guides/quickstart"]
+            "pages": ["index"]
           },
           {
             "group": "Integration",
             "pages": [
               "guides/authentication",
-              "guides/run-and-test",
               "guides/errors",
               "guides/rate-limits",
               "guides/webhook"
@@ -86,10 +87,6 @@
               "guides/education-pins",
               "guides/betting"
             ]
-          },
-          {
-            "group": "Virtual card",
-            "pages": ["guides/virtual-card"]
           },
           {
             "group": "eSIM",
@@ -126,27 +123,15 @@
           {
             "group": "VAS",
             "pages": [
-              "api-reference/external-v1/post-api-external-v1-data-buy",
-              "api-reference/external-v1/post-api-external-v1-airtime-buy",
-              "api-reference/external-v1/post-api-external-v1-validate",
-              "api-reference/external-v1/post-api-external-v1-cable-buy",
-              "api-reference/external-v1/post-api-external-v1-electricity-buy",
-              "api-reference/external-v1/post-api-external-v1-internet-buy",
-              "api-reference/education/post-api-education-pin-validate-product",
+              "api-reference/v1/post-api-v1-data-buy",
+              "api-reference/v1/post-api-v1-airtime-buy",
+              "api-reference/v1/post-api-v1-cable-validate",
+              "api-reference/v1/post-api-v1-electricity-validate",
+              "api-reference/v1/post-api-v1-cable-buy",
+              "api-reference/v1/post-api-v1-electricity-buy",
+              "api-reference/v1/post-api-v1-internet-buy",
               "api-reference/education/post-api-education-pin-purchase",
               "api-reference/betting/post-api-betting-funding"
-            ]
-          },
-          {
-            "group": "Virtual card",
-            "pages": [
-              "api-reference/virtual-card/get-api-cards",
-              "api-reference/virtual-card/post-api-cards",
-              "api-reference/virtual-card/get-api-cards-exchange-rate",
-              "api-reference/virtual-card/get-api-cards-transactions-cardId",
-              "api-reference/virtual-card/get-api-cards-cardId",
-              "api-reference/virtual-card/put-api-cards-cardId",
-              "api-reference/virtual-card/post-api-cards-wallet"
             ]
           },
           {
@@ -169,7 +154,7 @@
           },
           {
             "group": "Webhook",
-            "pages": ["api-reference/webhooks/partner-inbound"]
+            "pages": ["api-reference/webhooks/merchant-webhook"]
           }
         ]
       }

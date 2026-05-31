@@ -21,8 +21,8 @@ function slugifyMethodPath(method, p) {
 }
 
 function destFolder(apiPath) {
-  if (apiPath.startsWith("/api/external/v1")) return "external-v1";
-  if (apiPath.startsWith("/api/external/v1/services") || apiPath.startsWith("/api/products") || apiPath.startsWith("/api/plans") || apiPath.startsWith("/api/internetplans"))
+  if (apiPath.startsWith("/api/v1")) return "v1";
+  if (apiPath.startsWith("/api/v1/services") || apiPath.startsWith("/api/products") || apiPath.startsWith("/api/plans") || apiPath.startsWith("/api/internetplans"))
     return "catalog";
   if (apiPath.startsWith("/api/wallet")) return "wallet";
   if (apiPath.startsWith("/api/transactions")) return "transactions";
@@ -60,21 +60,21 @@ openapi: "${openapiLine}"
 }
 
 const whMdx = `---
-title: "Partner inbound webhook"
-description: "JSON POST from Dancity to your configured HTTPS URL"
+title: "Outbound webhook to your server"
+description: "Transaction events Dancity POSTs to your configured HTTPS webhook URL"
 ---
 
-See [Webhooks — verify & payload](/guides/webhook) for setup and security.
+Dancity **sends** webhooks **to your website** — not the other way around. See [Webhooks](/guides/webhook) for setup, signature verification, and event types.
 
 \`event\` / \`data\` fields are described in the OpenAPI \`webhooks.partnerTransaction\` entry (same \`openapi.json\`).
 `;
 const whDir = path.join(__dirname, "../api-reference/webhooks");
 fs.mkdirSync(whDir, { recursive: true });
-fs.writeFileSync(path.join(whDir, "partner-inbound.mdx"), whMdx, "utf8");
+fs.writeFileSync(path.join(whDir, "merchant-webhook.mdx"), whMdx, "utf8");
 
 // Output suggested group order
 const order = [
-  "external-v1",
+  "v1",
   "catalog",
   "wallet",
   "transactions",
@@ -86,7 +86,7 @@ const order = [
 ];
 
 const groupLabels = {
-  "external-v1": "VAS",
+  v1: "VAS",
   catalog: "Products & services",
   wallet: "Wallet",
   transactions: "Transactions",
@@ -114,8 +114,8 @@ const groups = order
     pages: byG[g],
   }));
 groups.push({
-  group: "Webhooks (partner)",
-  pages: ["api-reference/webhooks/partner-inbound"],
+  group: "Webhook",
+  pages: ["api-reference/webhooks/merchant-webhook"],
 });
 
 const out = {

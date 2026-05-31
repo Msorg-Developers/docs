@@ -24,17 +24,16 @@ channel: API
 ## Buy airtime
 
 ```
-POST /api/external/v1/airtime/buy
+POST /api/v1/airtime/buy
 ```
 
 ### Request body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `product` | string | ✓ | Product name from catalog (e.g., `"MTN Airtime"`) |
+| `product` | string | ✓ | Product name from catalog (e.g. `"MTN Airtime"`). Hyphens and underscores work as spaces — `"MTN-Airtime"` and `"MTN_Airtime"` are equivalent. |
 | `phone` | string | ✓ | 11-digit Nigerian phone number |
 | `amount` | number | ✓ | Amount in NGN (₦50 – ₦1,000) |
-| `pin` | string | ✓ | Your Dancity transaction PIN |
 | `customerRef` | string | | Your internal reference ID |
 | `saveAsBeneficiary` | boolean | | Save phone as beneficiary |
 | `beneficiaryName` | string | | Label for saved beneficiary |
@@ -42,20 +41,19 @@ POST /api/external/v1/airtime/buy
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/airtime/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/airtime/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
     "product": "MTN Airtime",
     "phone": "08012345678",
-    "amount": 200,
-    "pin": "1234"
+    "amount": 200
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/airtime/buy", {
+const res = await fetch("https://api.dancity.app/api/v1/airtime/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -66,7 +64,6 @@ const res = await fetch("https://api.dancity.app/api/external/v1/airtime/buy", {
     product: "MTN Airtime",
     phone: "08012345678",
     amount: 200,
-    pin: "1234",
   }),
 });
 const data = await res.json();
@@ -76,7 +73,7 @@ const data = await res.json();
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/airtime/buy",
+    "https://api.dancity.app/api/v1/airtime/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -86,7 +83,6 @@ res = requests.post(
         "product": "MTN Airtime",
         "phone": "08012345678",
         "amount": 200,
-        "pin": "1234",
     },
 )
 print(res.json())
@@ -98,54 +94,58 @@ print(res.json())
 ```json
 {
   "success": true,
-  "message": "Airtime purchase successful",
+  "message": "Airtime purchase processed",
   "data": {
-    "transactionId": "TXN-2025-XXXXX",
-    "tranxId": "dcy_ref_xxxxxxxx",
-    "status": "SUCCESS",
-    "amount": 200,
-    "phone": "08012345678",
-    "product": "MTN Airtime"
+    "_id": "6a1c3ba6f269d84e04f098cc",
+    "tranxId": "DNTY174825YP565I",
+    "service": "AIRTIME",
+    "product": "MTN Airtime",
+    "status": "FAILED",
+    "amount": 100,
+    "amountPaid": 98.5,
+    "number": "09037346247",
+    "balanceBefore": 5276,
+    "balanceAfter": 5177.5,
+    "apiResponse": "Airtime purchase failed"
   }
 }
 ```
 
+`amount` is the airtime value you requested. `amountPaid` is what was debited from the wallet (after any group discount).
+
 ---
 
-## Buy data bundle
+## Purchase Data
 
 ```
-POST /api/external/v1/data/buy
+POST /api/v1/data/buy
 ```
 
 ### Request body
 
 | Field | Type | Required | Description |
 |-------|------|----------|-------------|
-| `plan` | string | ✓ | Plan `_id` from `GET /plans/data` |
+| `plan` | string | ✓ | Plan `planId` or `_id` from `GET /api/v1/plans/data` |
 | `phone` | string | ✓ | 11-digit Nigerian phone number |
-| `wallettype` | string | ✓ | Wallet to debit (e.g., `"main"`) |
-| `pin` | string | ✓ | Your Dancity transaction PIN |
+| `wallettype` | string | | Wallet to debit. Defaults to `main` when omitted. |
 | `customerRef` | string | | Your internal reference ID |
 | `saveAsBeneficiary` | boolean | | Save phone as beneficiary |
 | `promocode` | string | | Discount promo code |
 
 <CodeGroup>
 ```bash cURL
-curl -sS -X POST "https://api.dancity.app/api/external/v1/data/buy" \
+curl -sS -X POST "https://api.dancity.app/api/v1/data/buy" \
   -H "Authorization: Bearer $DANCITY_API_KEY" \
   -H "Content-Type: application/json" \
   -H "channel: API" \
   -d '{
     "plan": "64f1a2b3c4d5e6f7a8b9c0d1",
-    "phone": "08012345678",
-    "wallettype": "main",
-    "pin": "1234"
+    "phone": "08012345678"
   }'
 ```
 
 ```javascript Node.js
-const res = await fetch("https://api.dancity.app/api/external/v1/data/buy", {
+const res = await fetch("https://api.dancity.app/api/v1/data/buy", {
   method: "POST",
   headers: {
     Authorization: `Bearer ${process.env.DANCITY_API_KEY}`,
@@ -155,8 +155,6 @@ const res = await fetch("https://api.dancity.app/api/external/v1/data/buy", {
   body: JSON.stringify({
     plan: "64f1a2b3c4d5e6f7a8b9c0d1", // from GET /plans/data
     phone: "08012345678",
-    wallettype: "main",
-    pin: "1234",
   }),
 });
 const data = await res.json();
@@ -166,7 +164,7 @@ const data = await res.json();
 import requests, os
 
 res = requests.post(
-    "https://api.dancity.app/api/external/v1/data/buy",
+    "https://api.dancity.app/api/v1/data/buy",
     headers={
         "Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}",
         "Content-Type": "application/json",
@@ -175,8 +173,6 @@ res = requests.post(
     json={
         "plan": "64f1a2b3c4d5e6f7a8b9c0d1",
         "phone": "08012345678",
-        "wallettype": "main",
-        "pin": "1234",
     },
 )
 print(res.json())
@@ -188,21 +184,21 @@ print(res.json())
 ## Full purchase flow
 
 ```
-1. GET /api/external/v1/products?service=Data
+1. GET /api/v1/products?service=Data
    → pick your product (e.g., "MTN Data")
 
-2. GET /api/external/v1/plans/data?product=MTN%20Data
+2. GET /api/v1/plans/data?product=MTN%20Data
    → pick a plan, note its _id
 
-3. GET /api/external/v1/wallet
+3. GET /api/v1/wallet
    → confirm sufficient balance
 
-4. POST /api/external/v1/data/buy
-   → send plan._id, phone, wallettype, pin
+4. POST /api/v1/data/buy
+   → send plan and phone (API key authenticates the request)
 ```
 
 <Tip>
-  Save `data.tranxId` from the response — use it with `GET /api/external/v1/transactions/{transactionId}` to requery the status if the response is slow or unclear.
+  Save `data.tranxId` from the response — use it with `GET /api/v1/transactions/{transactionId}` to requery the status if the response is slow or unclear.
 </Tip>
 
 <Warning>

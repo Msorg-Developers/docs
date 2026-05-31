@@ -25,7 +25,7 @@ Authorization: Bearer dcy_live_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ## List transactions
 
 ```
-GET /api/external/v1/transactions
+GET /api/v1/transactions
 ```
 
 ### Query parameters
@@ -45,7 +45,7 @@ GET /api/external/v1/transactions
 <CodeGroup>
 ```bash cURL
 # Last 20 successful airtime transactions
-curl -sS "https://api.dancity.app/api/external/v1/transactions?service=Airtime&status=SUCCESS&limit=20" \
+curl -sS "https://api.dancity.app/api/v1/transactions?service=Airtime&status=SUCCESS&limit=20" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
@@ -58,7 +58,7 @@ const params = new URLSearchParams({
 });
 
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/transactions?${params}`,
+  `https://api.dancity.app/api/v1/transactions?${params}`,
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();
@@ -70,7 +70,7 @@ const { data } = await res.json();
 import requests, os
 
 res = requests.get(
-    "https://api.dancity.app/api/external/v1/transactions",
+    "https://api.dancity.app/api/v1/transactions",
     params={"service": "Airtime", "status": "SUCCESS", "limit": 20, "page": 1},
     headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
 )
@@ -82,7 +82,7 @@ print(res.json()["data"])
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/transactions?start_date=2025-04-01T00:00:00.000Z&end_date=2025-04-30T23:59:59.000Z" \
+curl -sS "https://api.dancity.app/api/v1/transactions?start_date=2025-04-01T00:00:00.000Z&end_date=2025-04-30T23:59:59.000Z" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
@@ -94,7 +94,7 @@ const params = new URLSearchParams({
 });
 
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/transactions?${params}`,
+  `https://api.dancity.app/api/v1/transactions?${params}`,
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 ```
@@ -105,24 +105,28 @@ const res = await fetch(
 ## Requery a single transaction
 
 ```
-GET /api/external/v1/transactions/{transactionId}
+GET /api/v1/transactions/{transactionId}
 ```
 
-Use this endpoint to get the latest status of a specific transaction. You can pass either the Mongo `_id` or the external `tranxId` as the path parameter.
+Use this endpoint to get the latest status of a specific transaction. Pass any of these as the path parameter:
 
-| Param | Description |
-|-------|-------------|
-| `transactionId` | Mongo `_id` **or** `tranxId` from the purchase response |
+| Identifier | Example | Description |
+|------------|---------|-------------|
+| Mongo `_id` | `6a1c3e3de285680cc3b7d2ba` | Internal transaction id |
+| `tranxId` | `DNTY8374056F678V` | Dancity reference from the purchase response |
+| `customerRef` | `DATA-REF-001` | Your reference sent on the purchase request |
+
+If multiple transactions share the same `customerRef`, the most recent one is returned.
 
 <CodeGroup>
 ```bash cURL
-curl -sS "https://api.dancity.app/api/external/v1/transactions/TXN-2025-XXXXX" \
+curl -sS "https://api.dancity.app/api/v1/transactions/TXN-2025-XXXXX" \
   -H "Authorization: Bearer $DANCITY_API_KEY"
 ```
 
 ```javascript Node.js
 const res = await fetch(
-  `https://api.dancity.app/api/external/v1/transactions/${transactionId}`,
+  `https://api.dancity.app/api/v1/transactions/${transactionId}`,
   { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
 );
 const { data } = await res.json();
@@ -133,12 +137,45 @@ console.log(data.status); // "SUCCESS" | "FAILED" | "PENDING" | "PROCESSING" | "
 import requests, os
 
 res = requests.get(
-    f"https://api.dancity.app/api/external/v1/transactions/{transaction_id}",
+    f"https://api.dancity.app/api/v1/transactions/{transaction_id}",
     headers={"Authorization": f"Bearer {os.environ['DANCITY_API_KEY']}"},
 )
 status = res.json()["data"]["status"]
 ```
 </CodeGroup>
+
+### Sample response
+
+```json
+{
+  "success": true,
+  "message": "Transaction fetched",
+  "data": {
+    "_id": "6a1c3e3de285680cc3b7d2ba",
+    "tranxId": "DNTY8374056F678V",
+    "service": "DATA",
+    "product": "MTN GIFTING",
+    "tranxType": "DEBIT",
+    "status": "FAILED",
+    "currency": "NGN",
+    "remarks": "MTN GIFTING 40MB for 1 Day",
+    "amount": 50,
+    "fee": 0,
+    "amountPaid": 50,
+    "balanceBefore": 5276,
+    "balanceAfter": 5226,
+    "number": "09037346247",
+    "customerRef": "DATA-REF-001",
+    "channel": "API",
+    "paymentMedium": "MAIN WALLET",
+    "tranxDate": "2026-05-31T13:57:17.405Z",
+    "apiResponse": "Sorry, you are not allowed to migrate to Betamix Bundle Mini Plan. Thank you! — Oh dear! It seems xxxxxxxxxxx is not eligible for this bundle. Please select a new bundle and try again",
+    "isReversal": false,
+    "quantity": 0,
+    "createdAt": "2026-05-31T13:57:17.407Z"
+  }
+}
+```
 
 ---
 
@@ -175,7 +212,7 @@ async function fetchAllTransactions(startDate, endDate) {
       page: String(page),
     });
     const res = await fetch(
-      `https://api.dancity.app/api/external/v1/transactions?${params}`,
+      `https://api.dancity.app/api/v1/transactions?${params}`,
       { headers: { Authorization: `Bearer ${process.env.DANCITY_API_KEY}` } }
     );
     const { data } = await res.json();

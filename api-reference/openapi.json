@@ -2,22 +2,27 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Dancity API",
-    "description": "Paths below match `https://api.dancity.app` + global prefix `api`. Merchant: `Authorization: Bearer dcy_live_...` and `channel: API`. App: JWT. See Guides for flows.",
+    "description": "Paths below match the server base URL + global prefix `api`. Merchant: `Authorization: Bearer dcy_live_...` and `channel: API`. App: JWT. See Guides for flows.",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://api.dancity.app"
+      "url": "https://api.dancity.app",
+      "description": "Production"
+    },
+    {
+      "url": "http://localhost:6565",
+      "description": "Local development"
     }
   ],
   "tags": [
     {
       "name": "VAS",
-      "description": "Merchant API (`/api/external/v1`): catalog GETs (wallet, services, products, plans) and purchase routes; `channel: API` on POST buys; app education & betting where listed"
+      "description": "Merchant API (`/api/v1`): catalog GETs (wallet, services, products, plans) and purchase routes; `channel: API` on POST buys; app education & betting where listed"
     },
     {
       "name": "Products & services",
-      "description": "One GET for services, one for products, and one per plan type, each with query filters"
+      "description": "Catalog GETs: all services; products and plans with optional query filters"
     },
     {
       "name": "Wallet",
@@ -40,12 +45,8 @@
       "description": "eSIM catalog and purchase"
     },
     {
-      "name": "Virtual card",
-      "description": "Cards"
-    },
-    {
-      "name": "Models",
-      "description": "Enums and payload shapes"
+      "name": "Webhook",
+      "description": "Outbound events Dancity POSTs to your configured HTTPS URL"
     }
   ],
   "components": {
@@ -60,7 +61,7 @@
         "type": "apiKey",
         "in": "header",
         "name": "channel",
-        "description": "Required on VAS (merchant `/api/external/v1`) requests. Use `API` for server integrations."
+        "description": "Required on VAS (merchant `/api/v1`) requests. Use `API` for server integrations."
       },
       "JwtAuth": {
         "type": "http",
@@ -132,11 +133,179 @@
             "additionalProperties": true
           }
         }
+      },
+      "ExternalDataPlanItem": {
+        "type": "object",
+        "required": [
+          "_id",
+          "product",
+          "plan",
+          "price",
+          "validity",
+          "planId"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string",
+            "description": "Product name (e.g. MTN GIFTING)"
+          },
+          "plan": {
+            "type": "string",
+            "description": "Data size (e.g. 40MB, 1GB)"
+          },
+          "price": {
+            "type": "number",
+            "description": "Price in NGN"
+          },
+          "validity": {
+            "type": "string"
+          },
+          "planId": {
+            "type": "string",
+            "description": "Send this value as plan in POST /api/v1/data/buy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalDataPlansResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "data"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "SUCCESS"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "_id",
+                "product",
+                "plan",
+                "price",
+                "validity",
+                "planId"
+              ],
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "product": {
+                  "type": "string",
+                  "description": "Product name (e.g. MTN GIFTING)"
+                },
+                "plan": {
+                  "type": "string",
+                  "description": "Data size (e.g. 40MB, 1GB)"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "Price in NGN"
+                },
+                "validity": {
+                  "type": "string"
+                },
+                "planId": {
+                  "type": "string",
+                  "description": "Send this value as plan in POST /api/v1/data/buy"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
+      },
+      "ExternalCablePlanItem": {
+        "type": "object",
+        "required": [
+          "_id",
+          "product",
+          "plan",
+          "price",
+          "planId"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "product": {
+            "type": "string",
+            "description": "Cable product name (e.g. DSTV, GOTV)"
+          },
+          "plan": {
+            "type": "string",
+            "description": "planId from GET /api/v1/plans/cable — use as `cableplan` in POST /api/v1/cable/buy"
+          },
+          "price": {
+            "type": "number",
+            "description": "Price in NGN"
+          },
+          "planId": {
+            "type": "string",
+            "description": "Use as `cableplan` in POST /api/v1/cable/buy"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalCablePlansResponse": {
+        "type": "object",
+        "required": [
+          "message",
+          "data"
+        ],
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "SUCCESS"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "_id",
+                "product",
+                "plan",
+                "price",
+                "planId"
+              ],
+              "properties": {
+                "_id": {
+                  "type": "string"
+                },
+                "product": {
+                  "type": "string",
+                  "description": "Cable product name (e.g. DSTV, GOTV)"
+                },
+                "plan": {
+                  "type": "string",
+                  "description": "planId from GET /api/v1/plans/cable — use as `cableplan` in POST /api/v1/cable/buy"
+                },
+                "price": {
+                  "type": "number",
+                  "description": "Price in NGN"
+                },
+                "planId": {
+                  "type": "string",
+                  "description": "Use as `cableplan` in POST /api/v1/cable/buy"
+                }
+              },
+              "additionalProperties": false
+            }
+          }
+        }
       }
     }
   },
   "paths": {
-    "/api/external/v1/airtime/buy": {
+    "/api/v1/airtime/buy": {
       "post": {
         "tags": [
           "VAS"
@@ -161,6 +330,7 @@
                 "properties": {
                   "product": {
                     "type": "string",
+                    "description": "Product name from catalog. Hyphens and underscores are treated as spaces (e.g. MTN-Airtime, MTN_Airtime, MTN Airtime).",
                     "example": "MTN Airtime"
                   },
                   "phone": {
@@ -187,13 +357,30 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "Airtime purchase successful",
+                  "message": "Airtime purchase processed",
                   "data": {
-                    "transactionId": "TXN-20260506-001",
-                    "status": "SUCCESS",
-                    "amount": 500,
-                    "phone": "080*******",
-                    "network": "MTN"
+                    "_id": "6a1c3ba6f269d84e04f098cc",
+                    "tranxId": "DNTY174825YP565I",
+                    "service": "AIRTIME",
+                    "product": "MTN Airtime",
+                    "tranxType": "DEBIT",
+                    "status": "FAILED",
+                    "currency": "NGN",
+                    "remarks": "Airtime purchase for 09037346247",
+                    "amount": 100,
+                    "fee": 0,
+                    "amountPaid": 98.5,
+                    "balanceBefore": 5276,
+                    "balanceAfter": 5177.5,
+                    "number": "09037346247",
+                    "customerRef": "",
+                    "channel": "API",
+                    "paymentMedium": "MAIN WALLET",
+                    "tranxDate": "2026-05-31T13:46:14.825Z",
+                    "apiResponse": "Airtime purchase failed",
+                    "isReversal": false,
+                    "quantity": 0,
+                    "createdAt": "2026-05-31T13:46:14.827Z"
                   }
                 }
               }
@@ -238,12 +425,12 @@
         }
       }
     },
-    "/api/external/v1/data/buy": {
+    "/api/v1/data/buy": {
       "post": {
         "tags": [
           "VAS"
         ],
-        "summary": "Purchase data bundle",
+        "summary": "Purchase Data",
         "security": [
           {
             "DancityApiKey": []
@@ -257,13 +444,13 @@
                 "type": "object",
                 "required": [
                   "plan",
-                  "phone",
-                  "wallettype"
+                  "phone"
                 ],
                 "properties": {
                   "plan": {
                     "type": "string",
-                    "description": "Data plan ID from catalogue"
+                    "description": "Plan id from GET /api/v1/plans/data (`planId` field) or Mongo _id",
+                    "example": "40GB_MTN_GIFTING_1Day"
                   },
                   "phone": {
                     "type": "string",
@@ -271,10 +458,13 @@
                   },
                   "wallettype": {
                     "type": "string",
-                    "example": "main"
+                    "description": "Wallet type to debit. Defaults to main when omitted.",
+                    "example": "main",
+                    "default": "main"
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "DATA-REF-001"
                   }
                 }
               }
@@ -288,12 +478,30 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "Data purchase successful",
+                  "message": "Data purchase processed",
                   "data": {
-                    "transactionId": "TXN-20260506-002",
-                    "status": "SUCCESS",
-                    "plan": "1GB Daily",
-                    "phone": "080*******"
+                    "_id": "6a1c3cf26da239b6da0e26dc",
+                    "tranxId": "DNTY506236YALLPF",
+                    "service": "DATA",
+                    "product": "MTN GIFTING",
+                    "tranxType": "DEBIT",
+                    "status": "FAILED",
+                    "currency": "NGN",
+                    "remarks": "MTN GIFTING 40MB for 1 Day",
+                    "amount": 50,
+                    "fee": 0,
+                    "amountPaid": 50,
+                    "balanceBefore": 5276,
+                    "balanceAfter": 5226,
+                    "number": "09015665451",
+                    "customerRef": "DATA-REF-001",
+                    "channel": "API",
+                    "paymentMedium": "MAIN WALLET",
+                    "tranxDate": "2026-05-31T13:51:46.236Z",
+                    "apiResponse": "Sorry, you are not allowed to migrate to Betamix Bundle Mini Plan. Thank you! — Oh dear! It seems xxxxxxxxxxx is not eligible for this bundle. Please select a new bundle and try again",
+                    "isReversal": false,
+                    "quantity": 0,
+                    "createdAt": "2026-05-31T13:51:46.238Z"
                   }
                 }
               }
@@ -338,13 +546,14 @@
         }
       }
     },
-    "/api/external/v1/validate": {
+    "/api/v1/cable/validate": {
       "post": {
+        "operationId": "validateCableSmartcard",
         "tags": [
           "VAS"
         ],
-        "summary": "Validate cable smartcard or electricity meter (merchant)",
-        "description": "Single validation endpoint for external merchants. Set `type` to `\"cable\"` or `\"electricity\"`.",
+        "summary": "Validate Smartcard",
+        "description": "Validate a cable TV smartcard or IUC number and return the account holder name.",
         "security": [
           {
             "DancityApiKey": []
@@ -357,53 +566,18 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "type"
+                  "smartcardNumber",
+                  "cablename"
                 ],
                 "properties": {
-                  "type": {
-                    "type": "string",
-                    "enum": [
-                      "cable",
-                      "electricity"
-                    ],
-                    "description": "Validation type"
-                  },
                   "smartcardNumber": {
                     "type": "string",
-                    "description": "Required when type is cable"
+                    "example": "1234567890"
                   },
                   "cablename": {
                     "type": "string",
-                    "description": "Required when type is cable"
-                  },
-                  "meterNumber": {
-                    "type": "string",
-                    "description": "Required when type is electricity"
-                  },
-                  "productName": {
-                    "type": "string",
-                    "description": "Required when type is electricity"
-                  },
-                  "amount": {
-                    "type": "number",
-                    "description": "Required when type is electricity"
-                  },
-                  "meterType": {
-                    "type": "string",
-                    "enum": [
-                      "prepaid",
-                      "postpaid"
-                    ],
-                    "description": "Required when type is electricity"
-                  }
-                }
-              },
-              "examples": {
-                "Validate cable smartcard": {
-                  "value": {
-                    "type": "cable",
-                    "smartcardNumber": "1234567890",
-                    "cablename": "DSTV"
+                    "description": "Provider from GET /api/v1/products (e.g. DSTV, GOTV). Hyphens and underscores work as spaces.",
+                    "example": "DSTV"
                   }
                 }
               }
@@ -419,7 +593,12 @@
                   "success": true,
                   "message": "Validation successful",
                   "data": {
-                    "customerName": "John Doe"
+                    "status": "success",
+                    "customerName": "John Doe",
+                    "customerNumber": "1234567890",
+                    "smartcardNumber": "1234567890",
+                    "cablename": "DSTV",
+                    "message": "Validation successful"
                   }
                 }
               }
@@ -464,12 +643,124 @@
         }
       }
     },
-    "/api/external/v1/cable/buy": {
+    "/api/v1/electricity/validate": {
+      "post": {
+        "operationId": "validateElectricityMeter",
+        "tags": [
+          "VAS"
+        ],
+        "summary": "Validate Meter",
+        "description": "Validate an electricity meter number and return the customer name and address.",
+        "security": [
+          {
+            "DancityApiKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "meterNumber",
+                  "billerCode",
+                  "amount",
+                  "meterType"
+                ],
+                "properties": {
+                  "meterNumber": {
+                    "type": "string",
+                    "example": "45012345678"
+                  },
+                  "billerCode": {
+                    "type": "string",
+                    "description": "Biller code from GET /api/v1/products (e.g. EKEDC) or display name (e.g. Eko Electricity).",
+                    "example": "EKEDC"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 2000
+                  },
+                  "meterType": {
+                    "type": "string",
+                    "enum": [
+                      "prepaid",
+                      "postpaid"
+                    ],
+                    "example": "prepaid"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Validation successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "message": "Validation successful",
+                  "data": {
+                    "status": "success",
+                    "customerName": "John Doe",
+                    "address": "12 Example Street, Lagos",
+                    "meterNumber": "45012345678",
+                    "billerCode": "EKEDC",
+                    "message": "Validation successful"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Meter number not found",
+                  "statusCode": 400
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Invalid API key or IP not allowlisted",
+                  "statusCode": 401
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": false,
+                  "message": "Sorry, something went wrong. Please try again later",
+                  "statusCode": 500
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/cable/buy": {
       "post": {
         "tags": [
           "VAS"
         ],
-        "summary": "Purchase cable subscription",
+        "summary": "Cable subscription",
+        "description": "Renew a cable TV subscription.",
         "security": [
           {
             "DancityApiKey": []
@@ -484,24 +775,25 @@
                 "required": [
                   "smartcardNumber",
                   "cableplan",
-                  "cablename",
                   "customerName"
                 ],
                 "properties": {
                   "smartcardNumber": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "1234567890"
                   },
                   "cableplan": {
-                    "type": "string"
-                  },
-                  "cablename": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "planId from GET /api/v1/plans/cable (`planId` field) or Mongo _id. Provider is resolved from the plan.",
+                    "example": "GOtv_Supa_Plus_monthly_N16_800"
                   },
                   "customerName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "John Doe"
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "CABLE-REF-001"
                   }
                 }
               }
@@ -565,12 +857,13 @@
         }
       }
     },
-    "/api/external/v1/electricity/buy": {
+    "/api/v1/electricity/buy": {
       "post": {
         "tags": [
           "VAS"
         ],
-        "summary": "Purchase electricity (vend / postpaid)",
+        "summary": "Buy electricity token",
+        "description": "Vend prepaid electricity units or pay a postpaid bill.",
         "security": [
           {
             "DancityApiKey": []
@@ -584,6 +877,7 @@
                 "type": "object",
                 "required": [
                   "meterNumber",
+                  "billerCode",
                   "meterType",
                   "amount",
                   "customerName",
@@ -591,30 +885,38 @@
                 ],
                 "properties": {
                   "meterNumber": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "45012345678"
                   },
-                  "productName": {
-                    "type": "string"
+                  "billerCode": {
+                    "type": "string",
+                    "description": "Biller code from GET /api/v1/products (e.g. EKEDC) or display name (e.g. Eko Electricity).",
+                    "example": "EKEDC"
                   },
                   "meterType": {
                     "type": "string",
                     "enum": [
                       "prepaid",
                       "postpaid"
-                    ]
+                    ],
+                    "example": "prepaid"
                   },
                   "amount": {
                     "type": "number",
-                    "minimum": 500
+                    "minimum": 500,
+                    "example": 2000
                   },
                   "customerName": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "Jane Doe"
                   },
                   "address": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "12 Lekki Phase 1, Lagos"
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "ELEC-REF-001"
                   }
                 }
               }
@@ -677,7 +979,7 @@
         }
       }
     },
-    "/api/external/v1/internet/buy": {
+    "/api/v1/internet/buy": {
       "post": {
         "tags": [
           "VAS"
@@ -774,13 +1076,13 @@
         }
       }
     },
-    "/api/external/v1/transactions": {
+    "/api/v1/transactions": {
       "get": {
         "tags": [
           "Transactions"
         ],
         "summary": "Get transactions",
-        "description": "Fetch the authenticated user’s transactions. Use `page`, `limit`, and date range to filter. For a single row and up-to-date status, use `GET /api/external/v1/transactions/{transactionId}`.",
+        "description": "Fetch the authenticated user’s transactions. Use `page`, `limit`, and date range to filter. For a single row and up-to-date status, use `GET /api/v1/transactions/{transactionId}`.",
         "security": [
           {
             "DancityApiKey": []
@@ -830,14 +1132,39 @@
                   "success": true,
                   "message": "Transactions retrieved successfully",
                   "data": {
-                    "transactions": [],
+                    "transactions": [
+                      {
+                        "_id": "6a1c3e3de285680cc3b7d2ba",
+                        "tranxId": "DNTY8374056F678V",
+                        "service": "DATA",
+                        "product": "MTN GIFTING",
+                        "tranxType": "DEBIT",
+                        "status": "FAILED",
+                        "currency": "NGN",
+                        "remarks": "MTN GIFTING 40MB for 1 Day",
+                        "amount": 50,
+                        "fee": 0,
+                        "amountPaid": 50,
+                        "balanceBefore": 5276,
+                        "balanceAfter": 5226,
+                        "number": "09037346247",
+                        "customerRef": "DATA-REF-001",
+                        "channel": "API",
+                        "paymentMedium": "MAIN WALLET",
+                        "tranxDate": "2026-05-31T13:57:17.405Z",
+                        "apiResponse": "Sorry, you are not allowed to migrate to Betamix Bundle Mini Plan. Thank you! — Oh dear! It seems xxxxxxxxxxx is not eligible for this bundle. Please select a new bundle and try again",
+                        "isReversal": false,
+                        "quantity": 0,
+                        "createdAt": "2026-05-31T13:57:17.407Z"
+                      }
+                    ],
                     "pagination": {
                       "page": 1,
                       "limit": 10,
-                      "total": 0,
-                      "totalPages": 0,
+                      "total": 57,
+                      "totalPages": 6,
                       "hasPrevious": false,
-                      "hasNext": false
+                      "hasNext": true
                     }
                   }
                 }
@@ -871,27 +1198,19 @@
         }
       }
     },
-    "/api/external/v1/services": {
+    "/api/v1/services": {
       "get": {
         "tags": [
           "Products & services"
         ],
         "summary": "Get services",
-        "description": "Filter services by `name`.",
+        "description": "Returns all service categories.",
         "security": [
           {
             "DancityApiKey": []
           }
         ],
-        "parameters": [
-          {
-            "name": "name",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
+        "parameters": [],
         "responses": {
           "200": {
             "description": "OK",
@@ -902,11 +1221,43 @@
                   "allServices": [
                     {
                       "_id": "66d1ccc630a43475d74bde4d",
-                      "name": "DATA",
-                      "disable": true,
-                      "displayonmenu": true,
-                      "isutility": true,
-                      "icon": "string"
+                      "name": "DATA"
+                    },
+                    {
+                      "_id": "66e0c7670f79621083603b24",
+                      "name": "EXAM PIN"
+                    },
+                    {
+                      "_id": "66e303049b161ae6c74fa0a3",
+                      "name": "BILL"
+                    },
+                    {
+                      "_id": "66e9735fe61416ed74c118b2",
+                      "name": "INTERNET"
+                    },
+                    {
+                      "_id": "6835949ef33a409a9996b667",
+                      "name": "VIRTUAL CARD"
+                    },
+                    {
+                      "_id": "68d8462d3d56536a80047a69",
+                      "name": "Betting"
+                    },
+                    {
+                      "_id": "690b4284cf429961e4641223",
+                      "name": "AIRTIME"
+                    },
+                    {
+                      "_id": "69c27af6acd6c0eddbb5ce39",
+                      "name": "eSIM"
+                    },
+                    {
+                      "_id": "69e88decc1df22abb3e80558",
+                      "name": "Cable"
+                    },
+                    {
+                      "_id": "69e88e02c1df22abb3e805c6",
+                      "name": "Electricity"
                     }
                   ]
                 }
@@ -940,13 +1291,13 @@
         }
       }
     },
-    "/api/external/v1/transactions/{transactionId}": {
+    "/api/v1/transactions/{transactionId}": {
       "get": {
         "tags": [
           "Transactions"
         ],
         "summary": "Requery transaction",
-        "description": "Return one transaction and its current `status` by Mongo `_id` or by `transactionId`. Use to requery after a purchase or for polling. Typical `status` values include `SUCCESS`, `FAILED`, `PROCESSING`, `PENDING`, `CANCELLED`.",
+        "description": "Return one transaction and its current `status`. Pass Mongo `_id`, `tranxId` (e.g. `DNTY8374056F678V`), or `customerRef` (e.g. `DATA-REF-001`) as the path segment. When several rows share the same `customerRef`, the most recent is returned.",
         "security": [
           {
             "DancityApiKey": []
@@ -957,9 +1308,10 @@
             "name": "transactionId",
             "in": "path",
             "required": true,
-            "description": "Mongo id or external `transactionId` (same path segment).",
+            "description": "Mongo `_id`, `tranxId`, or `customerRef`.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "DNTY8374056F678V"
             }
           }
         ],
@@ -972,13 +1324,28 @@
                   "success": true,
                   "message": "Transaction fetched",
                   "data": {
-                    "transactionId": "TXN-20260506-001",
-                    "type": "DEBIT",
-                    "amount": 500,
-                    "status": "SUCCESS",
-                    "service": "Airtime",
-                    "phone": "080*******",
-                    "createdAt": "2026-05-06T10:00:00Z"
+                    "_id": "6a1c3e3de285680cc3b7d2ba",
+                    "tranxId": "DNTY8374056F678V",
+                    "service": "DATA",
+                    "product": "MTN GIFTING",
+                    "tranxType": "DEBIT",
+                    "status": "FAILED",
+                    "currency": "NGN",
+                    "remarks": "MTN GIFTING 40MB for 1 Day",
+                    "amount": 50,
+                    "fee": 0,
+                    "amountPaid": 50,
+                    "balanceBefore": 5276,
+                    "balanceAfter": 5226,
+                    "number": "09037346247",
+                    "customerRef": "DATA-REF-001",
+                    "channel": "API",
+                    "paymentMedium": "MAIN WALLET",
+                    "tranxDate": "2026-05-31T13:57:17.405Z",
+                    "apiResponse": "Sorry, you are not allowed to migrate to Betamix Bundle Mini Plan. Thank you! — Oh dear! It seems xxxxxxxxxxx is not eligible for this bundle. Please select a new bundle and try again",
+                    "isReversal": false,
+                    "quantity": 0,
+                    "createdAt": "2026-05-31T13:57:17.407Z"
                   }
                 }
               }
@@ -1023,7 +1390,7 @@
         }
       }
     },
-    "/api/external/v1/betting/funding": {
+    "/api/v1/betting/funding": {
       "post": {
         "tags": [
           "Betting"
@@ -1041,22 +1408,28 @@
                 "type": "object",
                 "required": [
                   "product",
-                  "customerIdentifier",
+                  "account_id",
                   "amount"
                 ],
                 "properties": {
                   "product": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Betting platform name from GET /api/v1/products (e.g. SportyBet).",
+                    "example": "SportyBet"
                   },
-                  "customerIdentifier": {
-                    "type": "string"
+                  "account_id": {
+                    "type": "string",
+                    "description": "Their betting account id.",
+                    "example": "12345678"
                   },
                   "amount": {
                     "type": "number",
-                    "minimum": 100
+                    "minimum": 100,
+                    "example": 1000
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "BET-REF-001"
                   }
                 }
               }
@@ -1074,7 +1447,7 @@
                   "data": {
                     "transactionId": "TXN-20260506-006",
                     "status": "SUCCESS",
-                    "customerIdentifier": "user@betsite.com",
+                    "account_id": "12345678",
                     "amount": 1000
                   }
                 }
@@ -1120,7 +1493,7 @@
         }
       }
     },
-    "/api/external/v1/education-pin/purchase": {
+    "/api/v1/education-pin/purchase": {
       "post": {
         "tags": [
           "Education"
@@ -1138,17 +1511,32 @@
                 "type": "object",
                 "required": [
                   "quantity",
-                  "product"
+                  "exam_name"
                 ],
                 "properties": {
                   "quantity": {
-                    "type": "number"
+                    "type": "number",
+                    "minimum": 1,
+                    "maximum": 5,
+                    "example": 1
                   },
-                  "product": {
-                    "type": "string"
+                  "exam_name": {
+                    "type": "string",
+                    "description": "Exam product name from GET /api/v1/products (e.g. WAEC Result Checker).",
+                    "example": "WAEC Result Checker"
+                  },
+                  "examNumber": {
+                    "type": "string",
+                    "description": "Required when exam_name is JAMB.",
+                    "example": "0123456789"
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "example": "EDU-REF-001"
+                  },
+                  "promocode": {
+                    "type": "string",
+                    "example": "EDU10"
                   }
                 }
               }
@@ -1216,96 +1604,7 @@
         }
       }
     },
-    "/api/external/v1/education-pin/validate-product": {
-      "post": {
-        "tags": [
-          "Education"
-        ],
-        "summary": "Validate education product / pricing",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": [
-                  "product",
-                  "quantity"
-                ],
-                "properties": {
-                  "product": {
-                    "type": "string"
-                  },
-                  "quantity": {
-                    "type": "number"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Product validated",
-                  "data": {
-                    "product": "WAEC Result Checker",
-                    "pricePerUnit": 4500,
-                    "quantity": 2,
-                    "total": 9000
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Validation failed",
-                  "statusCode": 400
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/esim/regions": {
+    "/api/v1/esim/regions": {
       "get": {
         "tags": [
           "eSIM"
@@ -1320,9 +1619,11 @@
           {
             "name": "type",
             "in": "query",
+            "description": "Filter regions: `1` = single-country only, `2` = multi-country/regional only. Omit to return all regions.",
             "schema": {
               "type": "number",
-              "description": "1=country, 2=multi"
+              "enum": [1, 2],
+              "example": 1
             }
           }
         ],
@@ -1383,7 +1684,7 @@
         }
       }
     },
-    "/api/external/v1/esim/packages": {
+    "/api/v1/esim/packages": {
       "get": {
         "tags": [
           "eSIM"
@@ -1399,6 +1700,7 @@
             "name": "regionCode",
             "in": "query",
             "required": true,
+            "description": "Region code from GET /api/v1/esim/regions (e.g. `NG` for Nigeria, `EU-42` for a multi-country region).",
             "schema": {
               "type": "string",
               "example": "NG"
@@ -1407,19 +1709,26 @@
           {
             "name": "regionType",
             "in": "query",
+            "description": "Region classification from the regions list — pass the selected region's `type` value. `country` = single country (default), `multi-country` = regional bundle covering multiple countries.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "enum": ["country", "multi-country", "global"],
+              "default": "country",
+              "example": "country"
             }
           },
           {
             "name": "type",
             "in": "query",
+            "description": "Package category: `BASE` = new eSIM to install, `TOPUP` = add data to an existing eSIM. Defaults to `BASE`.",
             "schema": {
               "type": "string",
               "enum": [
                 "BASE",
                 "TOPUP"
-              ]
+              ],
+              "default": "BASE",
+              "example": "BASE"
             }
           }
         ],
@@ -1471,12 +1780,13 @@
         }
       }
     },
-    "/api/external/v1/esim/topup-packages": {
+    "/api/v1/esim/topup-packages": {
       "get": {
         "tags": [
           "eSIM"
         ],
-        "summary": "Top-up packages for ICCID",
+        "summary": "Get top-up packages for ICCID",
+        "description": "Returns add-on data packages compatible with an existing eSIM. Pass the eSIM's ICCID from a prior purchase, `GET /api/v1/esim/my-esims`, or `GET /api/v1/esim/details/{transactionId}`. Purchase a returned `packageCode` via `POST /api/v1/esim/purchase`.",
         "security": [
           {
             "DancityApiKey": []
@@ -1487,8 +1797,10 @@
             "name": "iccid",
             "in": "query",
             "required": true,
+            "description": "ICCID of the active eSIM (from purchase response, GET /api/v1/esim/my-esims, or GET /api/v1/esim/details/{transactionId}).",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "8960000000000000001"
             }
           }
         ],
@@ -1499,15 +1811,24 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "Top-up packages fetched",
-                  "data": [
-                    {
-                      "packageCode": "NG-1GB-7D",
-                      "name": "Nigeria 1GB Top-Up",
-                      "dataAmount": "1GB",
-                      "price": 3000
-                    }
-                  ]
+                  "message": "eSIM topup packages fetched successfully",
+                  "data": {
+                    "packages": [
+                      {
+                        "packageCode": "NG-500MB-7D-TOP",
+                        "name": "Nigeria 500MB Top-Up",
+                        "description": "Add 500MB valid for 7 days",
+                        "price": 0.62,
+                        "currency": "USD",
+                        "volume": 524288000,
+                        "duration": 7,
+                        "type": "TOPUP",
+                        "regionCode": "NG",
+                        "priceInNaira": 1005
+                      }
+                    ],
+                    "exchangeRate": 1620
+                  }
                 }
               }
             }
@@ -1539,7 +1860,7 @@
         }
       }
     },
-    "/api/external/v1/esim/purchase": {
+    "/api/v1/esim/purchase": {
       "post": {
         "tags": [
           "eSIM"
@@ -1556,19 +1877,23 @@
               "schema": {
                 "type": "object",
                 "required": [
-                  "packageCode",
-                  "wallettype"
+                  "packageCode"
                 ],
                 "properties": {
                   "packageCode": {
-                    "type": "string"
-                  },
-                  "wallettype": {
                     "type": "string",
-                    "example": "main"
+                    "description": "Package code from GET /api/v1/esim/packages or GET /api/v1/esim/topup-packages.",
+                    "example": "NG-1GB-30D"
                   },
                   "customerRef": {
-                    "type": "string"
+                    "type": "string",
+                    "description": "Your internal reference for reconciliation.",
+                    "example": "ESIM-REF-001"
+                  },
+                  "iccid": {
+                    "type": "string",
+                    "description": "ICCID of the existing eSIM — required when purchasing a TOPUP package.",
+                    "example": "8960000000000000001"
                   }
                 }
               }
@@ -1632,12 +1957,13 @@
         }
       }
     },
-    "/api/external/v1/esim/my-esims": {
+    "/api/v1/esim/my-esims": {
       "get": {
         "tags": [
           "eSIM"
         ],
-        "summary": "List user eSIMs",
+        "summary": "Fetch eSIMs",
+        "description": "Returns active eSIMs purchased on the merchant account. Each item includes ICCID, package info, status, and activation details. Use `iccid` for top-ups via GET /api/v1/esim/topup-packages.",
         "security": [
           {
             "DancityApiKey": []
@@ -1647,15 +1973,21 @@
           {
             "name": "page",
             "in": "query",
+            "description": "Page number (starts at 1).",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 1,
+              "example": 1
             }
           },
           {
             "name": "limit",
             "in": "query",
+            "description": "Number of eSIMs per page.",
             "schema": {
-              "type": "integer"
+              "type": "integer",
+              "default": 20,
+              "example": 20
             }
           }
         ],
@@ -1666,15 +1998,57 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "eSIMs fetched",
-                  "data": [
-                    {
-                      "iccid": "8960000000000000001",
-                      "status": "ACTIVE",
-                      "packageCode": "NG-1GB-7D",
-                      "expiresAt": "2026-05-13T00:00:00Z"
+                  "message": "User eSIMs fetched successfully",
+                  "data": {
+                    "esims": [
+                      {
+                        "transactionId": "6a1c50347d0125d168aa32da",
+                        "tranxId": "DNTY4364368AOMYD",
+                        "packageCode": "CKH513",
+                        "packageName": "Qatar 1GB 7Days",
+                        "packageVolume": 1073741824,
+                        "packageDuration": 7,
+                        "regionCode": "QA",
+                        "amount": 2835,
+                        "currency": "NGN",
+                        "iccid": "8948010010013845234",
+                        "qrCodeUrl": "https://p.qrsim.net/4a8cf5af5f1c48e0b44f8eaf3af20220.png",
+                        "activationCode": "LPA:1$rsp-eu.simlessly.com$72056D3B588B49B4903120FC95BB96A4",
+                        "imsi": "260010183468325",
+                        "smdpAddress": null,
+                        "status": "GOT_RESOURCE",
+                        "dataUsageRemaining": 1073741824,
+                        "purchasedAt": "2026-05-31T15:13:56.436Z"
+                      },
+                      {
+                        "transactionId": "6a12d0d366a638d7d9e402a9",
+                        "tranxId": "DNTY003519MQ5RPN",
+                        "packageCode": "P0Q24KI1C",
+                        "packageName": "Nigeria 100MB 7Days",
+                        "packageVolume": 104857600,
+                        "packageDuration": 7,
+                        "regionCode": "NG",
+                        "amount": 975,
+                        "currency": "NGN",
+                        "iccid": "8948010010014447758",
+                        "qrCodeUrl": "https://p.qrsim.net/6d17f9164c9c4ad3a97ec890eac4f01b.png",
+                        "activationCode": "LPA:1$rsp-eu.simlessly.com$537A63701D1A4699ADB0A3206EE4CEA6",
+                        "imsi": "260010183528577",
+                        "smdpAddress": null,
+                        "status": "GOT_RESOURCE",
+                        "dataUsageRemaining": 104857600,
+                        "purchasedAt": "2026-05-24T10:20:03.519Z"
+                      }
+                    ],
+                    "pagination": {
+                      "page": 1,
+                      "limit": 20,
+                      "total": 2,
+                      "totalPages": 1,
+                      "hasPrevious": false,
+                      "hasNext": false
                     }
-                  ]
+                  }
                 }
               }
             }
@@ -1706,12 +2080,13 @@
         }
       }
     },
-    "/api/external/v1/esim/details/{transactionId}": {
+    "/api/v1/esim/details/{transactionId}": {
       "get": {
         "tags": [
           "eSIM"
         ],
-        "summary": "eSIM details for transaction",
+        "summary": "Get eSIM details",
+        "description": "Returns QR code, ICCID, activation code, and live status for one eSIM. Pass Mongo `_id`, `tranxId`, or `customerRef` from the purchase. Response `data` is the eSIM object only.",
         "security": [
           {
             "DancityApiKey": []
@@ -1722,8 +2097,10 @@
             "name": "transactionId",
             "in": "path",
             "required": true,
+            "description": "Mongo `_id`, `tranxId`, or `customerRef` from the eSIM purchase transaction.",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "DNTY8374056F678V"
             }
           }
         ],
@@ -1734,203 +2111,44 @@
               "application/json": {
                 "example": {
                   "success": true,
-                  "message": "eSIM details fetched",
+                  "message": "eSIM details fetched successfully",
                   "data": {
-                    "iccid": "8960000000000000001",
-                    "status": "ACTIVE",
-                    "dataRemaining": "500MB",
-                    "expiresAt": "2026-05-13T00:00:00Z"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/cards": {
-      "get": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "List virtual cards",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Cards fetched",
-                  "data": [
-                    {
-                      "cardId": "card_abc123",
-                      "last4": "4242",
+                    "iccid": "8948010010013845234",
+                    "imsi": "260010183468325",
+                    "qrCodeUrl": "https://p.qrsim.net/4a8cf5af5f1c48e0b44f8eaf3af20220.png",
+                    "activationCode": "LPA:1$rsp-eu.simlessly.com$72056D3B588B49B4903120FC95BB96A4",
+                    "status": "GOT_RESOURCE",
+                    "totalVolume": 1073741824,
+                    "totalDuration": 7,
+                    "validityRemaining": 7,
+                    "dataUsageRemaining": 1073741824,
+                    "packageDetails": {
+                      "name": "Qatar 1GB 7Days",
+                      "code": "CKH513",
+                      "volume": 1073741824,
+                      "duration": 7,
+                      "location": "QA",
+                      "price": 1.7115,
                       "currency": "USD",
-                      "balance": 50,
-                      "status": "ACTIVE"
-                    }
-                  ]
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Create virtual card",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Card created",
-                  "data": {
-                    "cardId": "card_abc123",
-                    "last4": "4242",
-                    "currency": "USD",
-                    "balance": 0,
-                    "status": "ACTIVE"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Validation failed",
-                  "statusCode": 400
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/cards/exchange-rate": {
-      "get": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Card USD/FX rates",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Exchange rate fetched",
-                  "data": {
-                    "currency": "USD",
-                    "rate": 1620,
-                    "baseCurrency": "NGN"
+                      "locationLogo": "https://flagcdn.com/w320/qa.png",
+                      "description": "Qatar 1GB 7Days",
+                      "speed": "3G/4G/5G",
+                      "coverage": [
+                        {
+                          "locationName": "Qatar",
+                          "locationLogo": "https://flagcdn.com/w320/qa.png",
+                          "locationCode": "QA",
+                          "operatorList": [
+                            {
+                              "operatorName": "ooredoo",
+                              "networkType": "5G"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    "createdAt": "2026-05-31T15:13:57.571Z",
+                    "expiredAt": "2026-11-27T15:13:58.000Z"
                   }
                 }
               }
@@ -1963,321 +2181,7 @@
         }
       }
     },
-    "/api/external/v1/cards/transactions/{cardId}": {
-      "get": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Card transactions",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "cardId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "page",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Transactions fetched",
-                  "data": {
-                    "total": 5,
-                    "transactions": [
-                      {
-                        "id": "txn_001",
-                        "amount": 10,
-                        "currency": "USD",
-                        "description": "Netflix",
-                        "createdAt": "2026-05-01T00:00:00Z"
-                      }
-                    ]
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/cards/wallet": {
-      "post": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Fund or withdraw from card",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Card funded successfully",
-                  "data": {
-                    "cardId": "card_abc123",
-                    "balance": 60,
-                    "currency": "USD"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Validation failed",
-                  "statusCode": 400
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/cards/{cardId}": {
-      "get": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Get card by ID",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "cardId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Card fetched",
-                  "data": {
-                    "cardId": "card_abc123",
-                    "last4": "4242",
-                    "currency": "USD",
-                    "balance": 50,
-                    "status": "ACTIVE"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      },
-      "put": {
-        "tags": [
-          "Virtual card"
-        ],
-        "summary": "Update card",
-        "security": [
-          {
-            "DancityApiKey": []
-          }
-        ],
-        "parameters": [
-          {
-            "name": "cardId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "additionalProperties": true
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": true,
-                  "message": "Card updated",
-                  "data": {
-                    "cardId": "card_abc123",
-                    "status": "FROZEN"
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad request",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Validation failed",
-                  "statusCode": 400
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Invalid API key or IP not allowlisted",
-                  "statusCode": 401
-                }
-              }
-            }
-          },
-          "500": {
-            "description": "Internal server error",
-            "content": {
-              "application/json": {
-                "example": {
-                  "success": false,
-                  "message": "Sorry, something went wrong. Please try again later",
-                  "statusCode": 500
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/external/v1/wallet": {
+    "/api/v1/wallet": {
       "get": {
         "tags": [
           "Wallet"
@@ -2341,7 +2245,7 @@
         }
       }
     },
-    "/api/external/v1/wallet/{id}": {
+    "/api/v1/wallet/{id}": {
       "get": {
         "tags": [
           "VAS"
@@ -2395,13 +2299,13 @@
         }
       }
     },
-    "/api/external/v1/products": {
+    "/api/v1/products": {
       "get": {
         "tags": [
           "Products & services"
         ],
         "summary": "Get products",
-        "description": "Filter products by `name` or `service` (service name).",
+        "description": "Filter products by `service` (service name).",
         "security": [
           {
             "DancityApiKey": []
@@ -2409,17 +2313,13 @@
         ],
         "parameters": [
           {
-            "name": "name",
-            "in": "query",
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
             "name": "service",
             "in": "query",
+            "description": "Service name from GET /api/v1/services (e.g. Airtime, Data).",
+            "example": "DATA",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "DATA"
             }
           }
         ],
@@ -2433,18 +2333,36 @@
                   "message": "SUCCESS",
                   "allProduct": [
                     {
-                      "_id": "68d846303d56536a80047ad1",
-                      "name": "1XBET",
-                      "note": "Fund 1XBET wallet",
-                      "disable": false,
-                      "service": {
-                        "_id": "68d8462d3d56536a80047a69",
-                        "name": "Betting"
-                      },
-                      "pricingmethod": "PERCENTAGE",
-                      "price": 1.5,
-                      "min": 100,
-                      "max": 100000
+                      "_id": "69b674f4f2afe9e7484cb814",
+                      "name": "Airtel Airtime",
+                      "service": "AIRTIME",
+                      "min": 50,
+                      "max": 50000,
+                      "discount": 2
+                    },
+                    {
+                      "_id": "69b674daf2afe9e7484cb7d2",
+                      "name": "Glo Airtime",
+                      "service": "AIRTIME",
+                      "min": 50,
+                      "max": 50000,
+                      "discount": 2
+                    },
+                    {
+                      "_id": "69b674c0f2afe9e7484cb790",
+                      "name": "MTN Airtime",
+                      "service": "AIRTIME",
+                      "min": 50,
+                      "max": 50000,
+                      "discount": 1.5
+                    },
+                    {
+                      "_id": "69b67513f2afe9e7484cb858",
+                      "name": "T2 Mobile Airtime",
+                      "service": "AIRTIME",
+                      "min": 50,
+                      "max": 50000,
+                      "discount": 2
                     }
                   ]
                 }
@@ -2478,13 +2396,13 @@
         }
       }
     },
-    "/api/external/v1/plans/data": {
+    "/api/v1/plans/data": {
       "get": {
         "tags": [
           "Products & services"
         ],
         "summary": "Get data plans",
-        "description": "Filter by `product`.",
+        "description": "Filter by product name from GET /api/v1/products.",
         "security": [
           {
             "DancityApiKey": []
@@ -2494,8 +2412,11 @@
           {
             "name": "product",
             "in": "query",
+            "description": "Product name from GET /api/v1/products (e.g. MTN GIFTING, GLO GIFTING). Accepts spaces, underscores, or hyphens: MTN GIFTING, MTN_GIFTING, MTN-GIFTING.",
+            "example": "MTN GIFTING",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "MTN GIFTING"
             }
           }
         ],
@@ -2509,24 +2430,883 @@
                   "data": [
                     {
                       "_id": "69e3b468c24a58c03a7ed3ab",
-                      "product": {
-                        "name": "MTN GIFTING",
-                        "disable": false,
-                        "service": {
-                          "name": "DATA",
-                          "disable": true
-                        },
-                        "sortOrder": 3
-                      },
-                      "plansize": 40,
-                      "plansizegb": 0.04,
-                      "planvolume": "MB",
-                      "sellingprice": 50,
+                      "product": "MTN GIFTING",
+                      "plan": "40MB",
+                      "price": 50,
                       "validity": "1 Day",
-                      "isbucketplan": false,
-                      "isHotDeal": true
+                      "planId": "40MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b49dc24a58c03a7ed3f6",
+                      "product": "MTN GIFTING",
+                      "plan": "75MB",
+                      "price": 75,
+                      "validity": "1 Day",
+                      "planId": "75MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b4d5c24a58c03a7ed441",
+                      "product": "MTN GIFTING",
+                      "plan": "100MB",
+                      "price": 100,
+                      "validity": "1 Day",
+                      "planId": "100MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b511c24a58c03a7ed4c8",
+                      "product": "MTN GIFTING",
+                      "plan": "110MB",
+                      "price": 100,
+                      "validity": "1 Day",
+                      "planId": "110MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b5b1c24a58c03a7ed560",
+                      "product": "MTN GIFTING",
+                      "plan": "230MB",
+                      "price": 200,
+                      "validity": "1 Day",
+                      "planId": "230MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b5ebc24a58c03a7ed586",
+                      "product": "MTN GIFTING",
+                      "plan": "500MB",
+                      "price": 350,
+                      "validity": "1 Day",
+                      "planId": "500MB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b6b8c24a58c03a7ed627",
+                      "product": "MTN GIFTING",
+                      "plan": "750MB",
+                      "price": 450,
+                      "validity": "2 Days",
+                      "planId": "750MB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b625c24a58c03a7ed5ac",
+                      "product": "MTN GIFTING",
+                      "plan": "1GB",
+                      "price": 500,
+                      "validity": "1 Day",
+                      "planId": "1GB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3c005c24a58c03a7eda84",
+                      "product": "MTN GIFTING",
+                      "plan": "500MB",
+                      "price": 500,
+                      "validity": "7 Days",
+                      "planId": "500MB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "69e3b6e7c24a58c03a7ed64c",
+                      "product": "MTN GIFTING",
+                      "plan": "1.5GB",
+                      "price": 600,
+                      "validity": "2 Days",
+                      "planId": "1.5GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b726c24a58c03a7ed672",
+                      "product": "MTN GIFTING",
+                      "plan": "2GB",
+                      "price": 750,
+                      "validity": "2 Days",
+                      "planId": "2GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b653c24a58c03a7ed5db",
+                      "product": "MTN GIFTING",
+                      "plan": "2.5GB",
+                      "price": 750,
+                      "validity": "1 Day",
+                      "planId": "2.5GB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3c0a7c24a58c03a7edaac",
+                      "product": "MTN GIFTING",
+                      "plan": "1GB",
+                      "price": 800,
+                      "validity": "7 Days",
+                      "planId": "1GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "69e3b75ac24a58c03a7ed698",
+                      "product": "MTN GIFTING",
+                      "plan": "2.5GB",
+                      "price": 900,
+                      "validity": "2 Days",
+                      "planId": "2.5GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3c0efc24a58c03a7edadb",
+                      "product": "MTN GIFTING",
+                      "plan": "1.5GB",
+                      "price": 1000,
+                      "validity": "7 Days",
+                      "planId": "1.5GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "69e3b783c24a58c03a7ed6c7",
+                      "product": "MTN GIFTING",
+                      "plan": "3.2GB",
+                      "price": 1000,
+                      "validity": "2 Days",
+                      "planId": "3.2GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b683c24a58c03a7ed601",
+                      "product": "MTN GIFTING",
+                      "plan": "3.5GB",
+                      "price": 1000,
+                      "validity": "1 Day",
+                      "planId": "3.5GB_MTN_GIFTING_1Day"
+                    },
+                    {
+                      "_id": "69e3b7f1c24a58c03a7ed6ee",
+                      "product": "MTN GIFTING",
+                      "plan": "4GB",
+                      "price": 1200,
+                      "validity": "2 Days",
+                      "planId": "4GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b89ac24a58c03a7ed769",
+                      "product": "MTN GIFTING",
+                      "plan": "2GB",
+                      "price": 1500,
+                      "validity": "30 Days",
+                      "planId": "2GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3c13ac24a58c03a7edb01",
+                      "product": "MTN GIFTING",
+                      "plan": "3.5GB",
+                      "price": 1500,
+                      "validity": "7 Days",
+                      "planId": "3.5GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "69e3b825c24a58c03a7ed714",
+                      "product": "MTN GIFTING",
+                      "plan": "5.5GB",
+                      "price": 1500,
+                      "validity": "2 Days",
+                      "planId": "5.5GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b84dc24a58c03a7ed739",
+                      "product": "MTN GIFTING",
+                      "plan": "7GB",
+                      "price": 1800,
+                      "validity": "2 Days",
+                      "planId": "7GB_MTN_GIFTING_2Days"
+                    },
+                    {
+                      "_id": "69e3b8cfc24a58c03a7ed78f",
+                      "product": "MTN GIFTING",
+                      "plan": "2.7GB",
+                      "price": 2000,
+                      "validity": "30 Days",
+                      "planId": "2.7GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3b8fcc24a58c03a7ed7b4",
+                      "product": "MTN GIFTING",
+                      "plan": "3.5GB",
+                      "price": 2500,
+                      "validity": "30 Days",
+                      "planId": "3.5GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3c169c24a58c03a7edb27",
+                      "product": "MTN GIFTING",
+                      "plan": "6GB",
+                      "price": 2500,
+                      "validity": "7 Days",
+                      "planId": "6GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "69e3b931c24a58c03a7ed7da",
+                      "product": "MTN GIFTING",
+                      "plan": "6.7GB",
+                      "price": 3000,
+                      "validity": "30 Days",
+                      "planId": "6.7GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3b962c24a58c03a7ed800",
+                      "product": "MTN GIFTING",
+                      "plan": "7GB",
+                      "price": 3500,
+                      "validity": "30 Days",
+                      "planId": "7GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3c19fc24a58c03a7edb4d",
+                      "product": "MTN GIFTING",
+                      "plan": "11GB",
+                      "price": 3500,
+                      "validity": "7 Days",
+                      "planId": "11GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "6a1ac68a0fd5bfc28866da93",
+                      "product": "MTN GIFTING",
+                      "plan": "15GB",
+                      "price": 4000,
+                      "validity": "7 days",
+                      "planId": "15GB_MTN_GIFTING_7days"
+                    },
+                    {
+                      "_id": "69e3b984c24a58c03a7ed826",
+                      "product": "MTN GIFTING",
+                      "plan": "10GB",
+                      "price": 4500,
+                      "validity": "30 Days",
+                      "planId": "10GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "6a1ac4690fd5bfc28866d37a",
+                      "product": "MTN GIFTING",
+                      "plan": "12.5GB",
+                      "price": 4500,
+                      "validity": "14 days",
+                      "planId": "12.5GB_MTN_GIFTING_14days"
+                    },
+                    {
+                      "_id": "69e3b9cac24a58c03a7ed855",
+                      "product": "MTN GIFTING",
+                      "plan": "14.5GB",
+                      "price": 5000,
+                      "validity": "30 Days",
+                      "planId": "14.5GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3c1c6c24a58c03a7edb73",
+                      "product": "MTN GIFTING",
+                      "plan": "20GB",
+                      "price": 5000,
+                      "validity": "7 Days",
+                      "planId": "20GB_MTN_GIFTING_7Days"
+                    },
+                    {
+                      "_id": "6a1ac6c70fd5bfc28866db30",
+                      "product": "MTN GIFTING",
+                      "plan": "20GB",
+                      "price": 5000,
+                      "validity": "7 days",
+                      "planId": "20GB_MTN_GIFTING_7days"
+                    },
+                    {
+                      "_id": "69e3ba35c24a58c03a7ed87c",
+                      "product": "MTN GIFTING",
+                      "plan": "12.5GB",
+                      "price": 5500,
+                      "validity": "30 Days",
+                      "planId": "12.5GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "6a1ac4bd0fd5bfc28866d49d",
+                      "product": "MTN GIFTING",
+                      "plan": "18GB",
+                      "price": 6000,
+                      "validity": "14 days",
+                      "planId": "18GB_MTN_GIFTING_14days"
+                    },
+                    {
+                      "_id": "69e3ba6fc24a58c03a7ed8a1",
+                      "product": "MTN GIFTING",
+                      "plan": "16.5GB",
+                      "price": 6500,
+                      "validity": "30 Days",
+                      "planId": "16.5GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3baa0c24a58c03a7ed8c7",
+                      "product": "MTN GIFTING",
+                      "plan": "25GB",
+                      "price": 7000,
+                      "validity": "30 Days(Postpaid)",
+                      "planId": "25GB_MTN_GIFTING_30Days(Postpaid)"
+                    },
+                    {
+                      "_id": "69e3bae5c24a58c03a7ed8ed",
+                      "product": "MTN GIFTING",
+                      "plan": "20GB",
+                      "price": 7500,
+                      "validity": "30 Days",
+                      "planId": "20GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "6a1ac5260fd5bfc28866d5fc",
+                      "product": "MTN GIFTING",
+                      "plan": "28GB",
+                      "price": 8000,
+                      "validity": "14 days",
+                      "planId": "28GB_MTN_GIFTING_14days"
+                    },
+                    {
+                      "_id": "69e3bc0ec24a58c03a7ed971",
+                      "product": "MTN GIFTING",
+                      "plan": "25GB",
+                      "price": 9000,
+                      "validity": "30 Days",
+                      "planId": "25GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "6a1ac57c0fd5bfc28866d699",
+                      "product": "MTN GIFTING",
+                      "plan": "40GB",
+                      "price": 10000,
+                      "validity": "14 days",
+                      "planId": "40GB_MTN_GIFTING_14days"
+                    },
+                    {
+                      "_id": "69e3bd62c24a58c03a7ed9ae",
+                      "product": "MTN GIFTING",
+                      "plan": "36GB",
+                      "price": 11000,
+                      "validity": "30 Days",
+                      "planId": "36GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3bdecc24a58c03a7ed9d5",
+                      "product": "MTN GIFTING",
+                      "plan": "65GB",
+                      "price": 16000,
+                      "validity": "30 days",
+                      "planId": "65GB_MTN_GIFTING_30days"
+                    },
+                    {
+                      "_id": "69e3be79c24a58c03a7eda06",
+                      "product": "MTN GIFTING",
+                      "plan": "75GB",
+                      "price": 18000,
+                      "validity": "30 Days",
+                      "planId": "75GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3b386c24a58c03a7ed2c9",
+                      "product": "MTN GIFTING",
+                      "plan": "90GB",
+                      "price": 25000,
+                      "validity": "60 Days",
+                      "planId": "90GB_MTN_GIFTING_60Days"
+                    },
+                    {
+                      "_id": "69e3beb1c24a58c03a7eda2c",
+                      "product": "MTN GIFTING",
+                      "plan": "165GB",
+                      "price": 35000,
+                      "validity": "30 Days",
+                      "planId": "165GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3b3ccc24a58c03a7ed30b",
+                      "product": "MTN GIFTING",
+                      "plan": "150GB",
+                      "price": 40000,
+                      "validity": "60 Days",
+                      "planId": "150GB_MTN_GIFTING_60Days"
+                    },
+                    {
+                      "_id": "69e3bf71c24a58c03a7eda54",
+                      "product": "MTN GIFTING",
+                      "plan": "250GB",
+                      "price": 55000,
+                      "validity": "30 Days",
+                      "planId": "250GB_MTN_GIFTING_30Days"
+                    },
+                    {
+                      "_id": "69e3b415c24a58c03a7ed35f",
+                      "product": "MTN GIFTING",
+                      "plan": "480GB",
+                      "price": 90000,
+                      "validity": "90 Days",
+                      "planId": "480GB_MTN_GIFTING_90Days"
+                    },
+                    {
+                      "_id": "69e3c211c24a58c03a7edba2",
+                      "product": "MTN GIFTING",
+                      "plan": "800GB",
+                      "price": 125000,
+                      "validity": "365 Days",
+                      "planId": "800GB_MTN_GIFTING_365Days"
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "_id",
+                          "product",
+                          "plan",
+                          "price",
+                          "validity",
+                          "planId"
+                        ],
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "product": {
+                            "type": "string",
+                            "description": "Product name (e.g. MTN GIFTING)"
+                          },
+                          "plan": {
+                            "type": "string",
+                            "description": "Data size (e.g. 40MB, 1GB)"
+                          },
+                          "price": {
+                            "type": "number",
+                            "description": "Price in NGN"
+                          },
+                          "validity": {
+                            "type": "string"
+                          },
+                          "planId": {
+                            "type": "string",
+                            "description": "Send this value as plan in POST /api/v1/data/buy"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "mtnGifting": {
+                    "summary": "MTN GIFTING data plans",
+                    "value": {
+                      "message": "SUCCESS",
+                      "data": [
+                        {
+                          "_id": "69e3b468c24a58c03a7ed3ab",
+                          "product": "MTN GIFTING",
+                          "plan": "40MB",
+                          "price": 50,
+                          "validity": "1 Day",
+                          "planId": "40MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b49dc24a58c03a7ed3f6",
+                          "product": "MTN GIFTING",
+                          "plan": "75MB",
+                          "price": 75,
+                          "validity": "1 Day",
+                          "planId": "75MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b4d5c24a58c03a7ed441",
+                          "product": "MTN GIFTING",
+                          "plan": "100MB",
+                          "price": 100,
+                          "validity": "1 Day",
+                          "planId": "100MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b511c24a58c03a7ed4c8",
+                          "product": "MTN GIFTING",
+                          "plan": "110MB",
+                          "price": 100,
+                          "validity": "1 Day",
+                          "planId": "110MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b5b1c24a58c03a7ed560",
+                          "product": "MTN GIFTING",
+                          "plan": "230MB",
+                          "price": 200,
+                          "validity": "1 Day",
+                          "planId": "230MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b5ebc24a58c03a7ed586",
+                          "product": "MTN GIFTING",
+                          "plan": "500MB",
+                          "price": 350,
+                          "validity": "1 Day",
+                          "planId": "500MB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b6b8c24a58c03a7ed627",
+                          "product": "MTN GIFTING",
+                          "plan": "750MB",
+                          "price": 450,
+                          "validity": "2 Days",
+                          "planId": "750MB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b625c24a58c03a7ed5ac",
+                          "product": "MTN GIFTING",
+                          "plan": "1GB",
+                          "price": 500,
+                          "validity": "1 Day",
+                          "planId": "1GB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3c005c24a58c03a7eda84",
+                          "product": "MTN GIFTING",
+                          "plan": "500MB",
+                          "price": 500,
+                          "validity": "7 Days",
+                          "planId": "500MB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "69e3b6e7c24a58c03a7ed64c",
+                          "product": "MTN GIFTING",
+                          "plan": "1.5GB",
+                          "price": 600,
+                          "validity": "2 Days",
+                          "planId": "1.5GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b726c24a58c03a7ed672",
+                          "product": "MTN GIFTING",
+                          "plan": "2GB",
+                          "price": 750,
+                          "validity": "2 Days",
+                          "planId": "2GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b653c24a58c03a7ed5db",
+                          "product": "MTN GIFTING",
+                          "plan": "2.5GB",
+                          "price": 750,
+                          "validity": "1 Day",
+                          "planId": "2.5GB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3c0a7c24a58c03a7edaac",
+                          "product": "MTN GIFTING",
+                          "plan": "1GB",
+                          "price": 800,
+                          "validity": "7 Days",
+                          "planId": "1GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "69e3b75ac24a58c03a7ed698",
+                          "product": "MTN GIFTING",
+                          "plan": "2.5GB",
+                          "price": 900,
+                          "validity": "2 Days",
+                          "planId": "2.5GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3c0efc24a58c03a7edadb",
+                          "product": "MTN GIFTING",
+                          "plan": "1.5GB",
+                          "price": 1000,
+                          "validity": "7 Days",
+                          "planId": "1.5GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "69e3b783c24a58c03a7ed6c7",
+                          "product": "MTN GIFTING",
+                          "plan": "3.2GB",
+                          "price": 1000,
+                          "validity": "2 Days",
+                          "planId": "3.2GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b683c24a58c03a7ed601",
+                          "product": "MTN GIFTING",
+                          "plan": "3.5GB",
+                          "price": 1000,
+                          "validity": "1 Day",
+                          "planId": "3.5GB_MTN_GIFTING_1Day"
+                        },
+                        {
+                          "_id": "69e3b7f1c24a58c03a7ed6ee",
+                          "product": "MTN GIFTING",
+                          "plan": "4GB",
+                          "price": 1200,
+                          "validity": "2 Days",
+                          "planId": "4GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b89ac24a58c03a7ed769",
+                          "product": "MTN GIFTING",
+                          "plan": "2GB",
+                          "price": 1500,
+                          "validity": "30 Days",
+                          "planId": "2GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3c13ac24a58c03a7edb01",
+                          "product": "MTN GIFTING",
+                          "plan": "3.5GB",
+                          "price": 1500,
+                          "validity": "7 Days",
+                          "planId": "3.5GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "69e3b825c24a58c03a7ed714",
+                          "product": "MTN GIFTING",
+                          "plan": "5.5GB",
+                          "price": 1500,
+                          "validity": "2 Days",
+                          "planId": "5.5GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b84dc24a58c03a7ed739",
+                          "product": "MTN GIFTING",
+                          "plan": "7GB",
+                          "price": 1800,
+                          "validity": "2 Days",
+                          "planId": "7GB_MTN_GIFTING_2Days"
+                        },
+                        {
+                          "_id": "69e3b8cfc24a58c03a7ed78f",
+                          "product": "MTN GIFTING",
+                          "plan": "2.7GB",
+                          "price": 2000,
+                          "validity": "30 Days",
+                          "planId": "2.7GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3b8fcc24a58c03a7ed7b4",
+                          "product": "MTN GIFTING",
+                          "plan": "3.5GB",
+                          "price": 2500,
+                          "validity": "30 Days",
+                          "planId": "3.5GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3c169c24a58c03a7edb27",
+                          "product": "MTN GIFTING",
+                          "plan": "6GB",
+                          "price": 2500,
+                          "validity": "7 Days",
+                          "planId": "6GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "69e3b931c24a58c03a7ed7da",
+                          "product": "MTN GIFTING",
+                          "plan": "6.7GB",
+                          "price": 3000,
+                          "validity": "30 Days",
+                          "planId": "6.7GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3b962c24a58c03a7ed800",
+                          "product": "MTN GIFTING",
+                          "plan": "7GB",
+                          "price": 3500,
+                          "validity": "30 Days",
+                          "planId": "7GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3c19fc24a58c03a7edb4d",
+                          "product": "MTN GIFTING",
+                          "plan": "11GB",
+                          "price": 3500,
+                          "validity": "7 Days",
+                          "planId": "11GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "6a1ac68a0fd5bfc28866da93",
+                          "product": "MTN GIFTING",
+                          "plan": "15GB",
+                          "price": 4000,
+                          "validity": "7 days",
+                          "planId": "15GB_MTN_GIFTING_7days"
+                        },
+                        {
+                          "_id": "69e3b984c24a58c03a7ed826",
+                          "product": "MTN GIFTING",
+                          "plan": "10GB",
+                          "price": 4500,
+                          "validity": "30 Days",
+                          "planId": "10GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "6a1ac4690fd5bfc28866d37a",
+                          "product": "MTN GIFTING",
+                          "plan": "12.5GB",
+                          "price": 4500,
+                          "validity": "14 days",
+                          "planId": "12.5GB_MTN_GIFTING_14days"
+                        },
+                        {
+                          "_id": "69e3b9cac24a58c03a7ed855",
+                          "product": "MTN GIFTING",
+                          "plan": "14.5GB",
+                          "price": 5000,
+                          "validity": "30 Days",
+                          "planId": "14.5GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3c1c6c24a58c03a7edb73",
+                          "product": "MTN GIFTING",
+                          "plan": "20GB",
+                          "price": 5000,
+                          "validity": "7 Days",
+                          "planId": "20GB_MTN_GIFTING_7Days"
+                        },
+                        {
+                          "_id": "6a1ac6c70fd5bfc28866db30",
+                          "product": "MTN GIFTING",
+                          "plan": "20GB",
+                          "price": 5000,
+                          "validity": "7 days",
+                          "planId": "20GB_MTN_GIFTING_7days"
+                        },
+                        {
+                          "_id": "69e3ba35c24a58c03a7ed87c",
+                          "product": "MTN GIFTING",
+                          "plan": "12.5GB",
+                          "price": 5500,
+                          "validity": "30 Days",
+                          "planId": "12.5GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "6a1ac4bd0fd5bfc28866d49d",
+                          "product": "MTN GIFTING",
+                          "plan": "18GB",
+                          "price": 6000,
+                          "validity": "14 days",
+                          "planId": "18GB_MTN_GIFTING_14days"
+                        },
+                        {
+                          "_id": "69e3ba6fc24a58c03a7ed8a1",
+                          "product": "MTN GIFTING",
+                          "plan": "16.5GB",
+                          "price": 6500,
+                          "validity": "30 Days",
+                          "planId": "16.5GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3baa0c24a58c03a7ed8c7",
+                          "product": "MTN GIFTING",
+                          "plan": "25GB",
+                          "price": 7000,
+                          "validity": "30 Days(Postpaid)",
+                          "planId": "25GB_MTN_GIFTING_30Days(Postpaid)"
+                        },
+                        {
+                          "_id": "69e3bae5c24a58c03a7ed8ed",
+                          "product": "MTN GIFTING",
+                          "plan": "20GB",
+                          "price": 7500,
+                          "validity": "30 Days",
+                          "planId": "20GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "6a1ac5260fd5bfc28866d5fc",
+                          "product": "MTN GIFTING",
+                          "plan": "28GB",
+                          "price": 8000,
+                          "validity": "14 days",
+                          "planId": "28GB_MTN_GIFTING_14days"
+                        },
+                        {
+                          "_id": "69e3bc0ec24a58c03a7ed971",
+                          "product": "MTN GIFTING",
+                          "plan": "25GB",
+                          "price": 9000,
+                          "validity": "30 Days",
+                          "planId": "25GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "6a1ac57c0fd5bfc28866d699",
+                          "product": "MTN GIFTING",
+                          "plan": "40GB",
+                          "price": 10000,
+                          "validity": "14 days",
+                          "planId": "40GB_MTN_GIFTING_14days"
+                        },
+                        {
+                          "_id": "69e3bd62c24a58c03a7ed9ae",
+                          "product": "MTN GIFTING",
+                          "plan": "36GB",
+                          "price": 11000,
+                          "validity": "30 Days",
+                          "planId": "36GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3bdecc24a58c03a7ed9d5",
+                          "product": "MTN GIFTING",
+                          "plan": "65GB",
+                          "price": 16000,
+                          "validity": "30 days",
+                          "planId": "65GB_MTN_GIFTING_30days"
+                        },
+                        {
+                          "_id": "69e3be79c24a58c03a7eda06",
+                          "product": "MTN GIFTING",
+                          "plan": "75GB",
+                          "price": 18000,
+                          "validity": "30 Days",
+                          "planId": "75GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3b386c24a58c03a7ed2c9",
+                          "product": "MTN GIFTING",
+                          "plan": "90GB",
+                          "price": 25000,
+                          "validity": "60 Days",
+                          "planId": "90GB_MTN_GIFTING_60Days"
+                        },
+                        {
+                          "_id": "69e3beb1c24a58c03a7eda2c",
+                          "product": "MTN GIFTING",
+                          "plan": "165GB",
+                          "price": 35000,
+                          "validity": "30 Days",
+                          "planId": "165GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3b3ccc24a58c03a7ed30b",
+                          "product": "MTN GIFTING",
+                          "plan": "150GB",
+                          "price": 40000,
+                          "validity": "60 Days",
+                          "planId": "150GB_MTN_GIFTING_60Days"
+                        },
+                        {
+                          "_id": "69e3bf71c24a58c03a7eda54",
+                          "product": "MTN GIFTING",
+                          "plan": "250GB",
+                          "price": 55000,
+                          "validity": "30 Days",
+                          "planId": "250GB_MTN_GIFTING_30Days"
+                        },
+                        {
+                          "_id": "69e3b415c24a58c03a7ed35f",
+                          "product": "MTN GIFTING",
+                          "plan": "480GB",
+                          "price": 90000,
+                          "validity": "90 Days",
+                          "planId": "480GB_MTN_GIFTING_90Days"
+                        },
+                        {
+                          "_id": "69e3c211c24a58c03a7edba2",
+                          "product": "MTN GIFTING",
+                          "plan": "800GB",
+                          "price": 125000,
+                          "validity": "365 Days",
+                          "planId": "800GB_MTN_GIFTING_365Days"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -2558,13 +3338,13 @@
         }
       }
     },
-    "/api/external/v1/plans/cable": {
+    "/api/v1/plans/cable": {
       "get": {
         "tags": [
           "Products & services"
         ],
         "summary": "Get cable plans",
-        "description": "Filter with `product`.",
+        "description": "Filter by product name from GET /api/v1/products.",
         "security": [
           {
             "DancityApiKey": []
@@ -2574,8 +3354,11 @@
           {
             "name": "product",
             "in": "query",
+            "description": "Product name from GET /api/v1/products (e.g. DSTV, GOTV, Startimes).",
+            "example": "GOTV",
             "schema": {
-              "type": "string"
+              "type": "string",
+              "example": "GOTV"
             }
           }
         ],
@@ -2589,17 +3372,189 @@
                   "data": [
                     {
                       "_id": "66eebbe090fec69424007967",
-                      "package": "GOtv Supa Plus - monthly N16,800",
-                      "product": {
-                        "name": "GOTV"
-                      },
-                      "sellingprice": 16800,
-                      "costprice": 16800,
-                      "commission": 0,
-                      "disable": false,
-                      "vendingmedium": "vtpass"
+                      "product": "GOTV",
+                      "plan": "GOtv Supa Plus - monthly N16,800",
+                      "price": 16800,
+                      "planId": "GOtv_Supa_Plus_monthly_N16_800"
+                    },
+                    {
+                      "_id": "66eebc0a90fec6942400796e",
+                      "product": "GOTV",
+                      "plan": "GOtv Supa - monthly N11,400",
+                      "price": 11400,
+                      "planId": "GOtv_Supa_monthly_N11_400"
+                    },
+                    {
+                      "_id": "66eebd3a90fec694240079d0",
+                      "product": "GOTV",
+                      "plan": "GOtv Jolli N5,800",
+                      "price": 5800,
+                      "planId": "GOtv_Jolli_N5_800"
+                    },
+                    {
+                      "_id": "66eebd4490fec694240079d7",
+                      "product": "GOTV",
+                      "plan": "GOtv Jinja N3,900",
+                      "price": 3900,
+                      "planId": "GOtv_Jinja_N3_900"
+                    },
+                    {
+                      "_id": "66eebd5290fec694240079de",
+                      "product": "GOTV",
+                      "plan": "GOtv Smallie - monthly N1900",
+                      "price": 1900,
+                      "planId": "GOtv_Smallie_monthly_N1900"
+                    },
+                    {
+                      "_id": "66eebd6290fec694240079e5",
+                      "product": "GOTV",
+                      "plan": "GOtv Smallie - quarterly N5,100",
+                      "price": 5100,
+                      "planId": "GOtv_Smallie_quarterly_N5_100"
+                    },
+                    {
+                      "_id": "66eebd6f90fec694240079ec",
+                      "product": "GOTV",
+                      "plan": "GOtv Smallie - yearly N15,000",
+                      "price": 15000,
+                      "planId": "GOtv_Smallie_yearly_N15_000"
+                    },
+                    {
+                      "_id": "6798708ea30810e1d179bdd2",
+                      "product": "GOTV",
+                      "plan": "GOtv Max N8,500",
+                      "price": 8500,
+                      "planId": "GOtv_Max_N8_500"
+                    },
+                    {
+                      "_id": "69e09ddf2023e9b41b448e8e",
+                      "product": "GOTV",
+                      "plan": "GOtv Max",
+                      "price": 8500,
+                      "planId": "GOtv_Max"
                     }
                   ]
+                },
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "message",
+                    "data"
+                  ],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "example": "SUCCESS"
+                    },
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "required": [
+                          "_id",
+                          "product",
+                          "plan",
+                          "price",
+                          "planId"
+                        ],
+                        "properties": {
+                          "_id": {
+                            "type": "string"
+                          },
+                          "product": {
+                            "type": "string",
+                            "description": "Cable product name (e.g. DSTV, GOTV)"
+                          },
+                          "plan": {
+                            "type": "string",
+                            "description": "planId from GET /api/v1/plans/cable — use as `cableplan` in POST /api/v1/cable/buy"
+                          },
+                          "price": {
+                            "type": "number",
+                            "description": "Price in NGN"
+                          },
+                          "planId": {
+                            "type": "string",
+                            "description": "Use as `cableplan` in POST /api/v1/cable/buy"
+                          }
+                        },
+                        "additionalProperties": false
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "gotvPlans": {
+                    "summary": "GOTV cable plans",
+                    "value": {
+                      "message": "SUCCESS",
+                      "data": [
+                        {
+                          "_id": "66eebbe090fec69424007967",
+                          "product": "GOTV",
+                          "plan": "GOtv Supa Plus - monthly N16,800",
+                          "price": 16800,
+                          "planId": "GOtv_Supa_Plus_monthly_N16_800"
+                        },
+                        {
+                          "_id": "66eebc0a90fec6942400796e",
+                          "product": "GOTV",
+                          "plan": "GOtv Supa - monthly N11,400",
+                          "price": 11400,
+                          "planId": "GOtv_Supa_monthly_N11_400"
+                        },
+                        {
+                          "_id": "66eebd3a90fec694240079d0",
+                          "product": "GOTV",
+                          "plan": "GOtv Jolli N5,800",
+                          "price": 5800,
+                          "planId": "GOtv_Jolli_N5_800"
+                        },
+                        {
+                          "_id": "66eebd4490fec694240079d7",
+                          "product": "GOTV",
+                          "plan": "GOtv Jinja N3,900",
+                          "price": 3900,
+                          "planId": "GOtv_Jinja_N3_900"
+                        },
+                        {
+                          "_id": "66eebd5290fec694240079de",
+                          "product": "GOTV",
+                          "plan": "GOtv Smallie - monthly N1900",
+                          "price": 1900,
+                          "planId": "GOtv_Smallie_monthly_N1900"
+                        },
+                        {
+                          "_id": "66eebd6290fec694240079e5",
+                          "product": "GOTV",
+                          "plan": "GOtv Smallie - quarterly N5,100",
+                          "price": 5100,
+                          "planId": "GOtv_Smallie_quarterly_N5_100"
+                        },
+                        {
+                          "_id": "66eebd6f90fec694240079ec",
+                          "product": "GOTV",
+                          "plan": "GOtv Smallie - yearly N15,000",
+                          "price": 15000,
+                          "planId": "GOtv_Smallie_yearly_N15_000"
+                        },
+                        {
+                          "_id": "6798708ea30810e1d179bdd2",
+                          "product": "GOTV",
+                          "plan": "GOtv Max N8,500",
+                          "price": 8500,
+                          "planId": "GOtv_Max_N8_500"
+                        },
+                        {
+                          "_id": "69e09ddf2023e9b41b448e8e",
+                          "product": "GOTV",
+                          "plan": "GOtv Max",
+                          "price": 8500,
+                          "planId": "GOtv_Max"
+                        }
+                      ]
+                    }
+                  }
                 }
               }
             }
@@ -2631,7 +3586,7 @@
         }
       }
     },
-    "/api/external/v1/plans/internet": {
+    "/api/v1/plans/internet": {
       "get": {
         "tags": [
           "Products & services"
@@ -2721,10 +3676,10 @@
     "partnerTransaction": {
       "post": {
         "tags": [
-          "Models"
+          "Webhook"
         ],
-        "summary": "Inbound webhook (Dancity → your HTTPS URL)",
-        "description": "Server-to-server POST. Verify signature as in Guides → Webhook.",
+        "summary": "Outbound webhook to your server",
+        "description": "Dancity POSTs this payload to your configured HTTPS webhook URL when transaction events occur. You do not call this on the Dancity API — implement an endpoint on your server to receive it. Verify `X-Dancity-Signature` as in Guides → Webhook.",
         "requestBody": {
           "content": {
             "application/json": {
